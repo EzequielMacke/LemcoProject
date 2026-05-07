@@ -31,7 +31,7 @@ class RemisionController extends Controller
         $pdf = Pdf::loadView('recepcion_probetas.pdf', compact('obra', 'remision', 'logo'))
             ->setPaper('a4', 'portrait');
 
-        return $pdf->download("remision-{$remision->nro}.pdf");
+        return $pdf->download("Obra {$obra->nombre} Remision Nro {$remision->nro}.pdf");
     }
 
     public function create(Obra $obra): View
