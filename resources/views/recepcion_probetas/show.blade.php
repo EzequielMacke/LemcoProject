@@ -53,13 +53,15 @@
         }
 
         /* ── Page ── */
-        .page { flex: 1; padding: 28px 24px 48px; display: flex; flex-direction: column; gap: 20px; max-width: 1100px; width: 100%; margin: 0 auto; }
+        .page { flex: 1; padding: 28px 24px 48px; display: flex; flex-direction: column; gap: 20px; }
 
         /* ── Header ── */
         .page-header {
             display: flex; align-items: center; gap: 14px;
+            justify-content: flex-start;
             animation: fadeUp 0.35s ease both;
         }
+        .page-header .btn-pdf { margin-left: auto; }
         .page-label { font-size: 11.5px; font-weight: 600; color: #4f46e5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
         .page-heading { font-size: 20px; font-weight: 700; color: #0f172a; letter-spacing: -0.3px; }
         .badge-estado {
@@ -69,6 +71,19 @@
         }
         .badge-activa  { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
         .badge-anulada { background: #f1f3f5; color: #9ca3af; border: 1.5px solid #e5e7eb; }
+
+        .btn-pdf {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: #4f46e5; color: #fff;
+            border: none; border-radius: 10px;
+            padding: 8px 16px; font-size: 13px; font-weight: 600;
+            font-family: 'Inter', sans-serif; text-decoration: none;
+            box-shadow: 0 3px 10px rgba(79,70,229,0.25);
+            transition: opacity 0.15s, transform 0.15s;
+            cursor: pointer; flex-shrink: 0;
+        }
+        .btn-pdf:hover { opacity: 0.88; transform: translateY(-1px); }
+        .btn-pdf svg { width: 15px; height: 15px; }
 
         /* ── Panel ── */
         .panel {
@@ -213,6 +228,12 @@
         @else
             <span class="badge-estado badge-activa">Activa</span>
         @endif
+        <a href="{{ route('remisiones.pdf', [$obra, $remision]) }}" class="btn-pdf">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+            </svg>
+            Descargar PDF
+        </a>
     </div>
 
     {{-- Datos generales --}}
@@ -290,7 +311,7 @@
                             <th>Mixer</th>
                             <th>Edad ensayo (días)</th>
                             <th>Elemento</th>
-                            <th>Nombre</th>
+                            <th>Muestra</th>
                         </tr>
                     </thead>
                     <tbody>

@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Obra;
 use App\Models\Probeta;
 use App\Models\Remision;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class RemisionController extends Controller
@@ -15,6 +17,21 @@ class RemisionController extends Controller
     {
         $remision->load(['recibidoPor.persona', 'probetas']);
         return view('recepcion_probetas.show', compact('obra', 'remision'));
+    }
+
+    public function pdf(Obra $obra, Remision $remision): Response
+    {
+        $remision->load(['recibidoPor.persona', 'probetas']);
+
+        $logoPath = storage_path('app/private/logo/logo-web.png');
+        $logo = file_exists($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : null;
+
+        $pdf = Pdf::loadView('recepcion_probetas.pdf', compact('obra', 'remision', 'logo'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download("remision-{$remision->nro}.pdf");
     }
 
     public function create(Obra $obra): View
