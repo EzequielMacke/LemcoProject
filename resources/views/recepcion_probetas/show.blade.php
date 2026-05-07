@@ -61,7 +61,8 @@
             justify-content: flex-start;
             animation: fadeUp 0.35s ease both;
         }
-        .page-header .btn-pdf { margin-left: auto; }
+        .header-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
         .page-label { font-size: 11.5px; font-weight: 600; color: #4f46e5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
         .page-heading { font-size: 20px; font-weight: 700; color: #0f172a; letter-spacing: -0.3px; }
         .badge-estado {
@@ -84,6 +85,99 @@
         }
         .btn-pdf:hover { opacity: 0.88; transform: translateY(-1px); }
         .btn-pdf svg { width: 15px; height: 15px; }
+
+        .btn-email {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: #fff; color: #374151;
+            border: 1.5px solid #e9ecef; border-radius: 10px;
+            padding: 8px 16px; font-size: 13px; font-weight: 600;
+            font-family: 'Inter', sans-serif; text-decoration: none;
+            transition: all 0.15s; cursor: pointer; flex-shrink: 0;
+        }
+        .btn-email:hover { background: #f8f9fa; border-color: #d1d5db; color: #111827; }
+        .btn-email svg { width: 15px; height: 15px; }
+
+        /* ── Modal enviar ── */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+            display: none; align-items: center; justify-content: center;
+            z-index: 100; padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: #fff; border-radius: 18px;
+            width: 100%; max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            animation: modalIn 0.2s ease both;
+            display: flex; flex-direction: column;
+            max-height: 90vh;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-head {
+            padding: 18px 20px 14px; border-bottom: 1px solid #f1f3f5;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .modal-title { font-size: 15px; font-weight: 700; color: #0f172a; }
+        .modal-close {
+            display: flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; border-radius: 8px;
+            border: 1.5px solid #e9ecef; background: none;
+            cursor: pointer; color: #9ca3af; transition: all 0.15s; padding: 0;
+        }
+        .modal-close:hover { background: #f1f3f5; color: #374151; }
+        .modal-close svg { width: 14px; height: 14px; }
+        .modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+        .modal-foot {
+            padding: 14px 20px; border-top: 1.5px solid #e9ecef;
+            display: flex; justify-content: flex-end; gap: 8px;
+            flex-shrink: 0;
+        }
+
+        /* Grupos de destinatarios */
+        .group-label {
+            font-size: 10.5px; font-weight: 700; color: #9ca3af;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            margin-bottom: 8px; margin-top: 4px;
+        }
+        .group-label:not(:first-child) { margin-top: 18px; }
+        .recipient-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 9px 12px; border-radius: 10px;
+            border: 1.5px solid #e9ecef; margin-bottom: 6px;
+            cursor: pointer; transition: background 0.12s, border-color 0.12s;
+            background: #fff;
+        }
+        .recipient-row:hover { background: #f8faff; border-color: #c7d2fe; }
+        .recipient-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: #4f46e5; flex-shrink: 0; cursor: pointer; }
+        .recipient-info { flex: 1; min-width: 0; }
+        .recipient-name { display: block; font-size: 13px; font-weight: 600; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .recipient-email { display: block; font-size: 11.5px; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .recipient-no-email { font-size: 11.5px; color: #fca5a5; font-style: italic; }
+        .empty-group { font-size: 12.5px; color: #9ca3af; padding: 8px 0; font-style: italic; }
+
+        .btn-cancel {
+            display: inline-flex; align-items: center;
+            background: none; border: 1.5px solid #e9ecef; border-radius: 10px;
+            padding: 8px 16px; font-size: 13px; font-weight: 500;
+            color: #6b7280; cursor: pointer; font-family: 'Inter', sans-serif;
+            transition: all 0.15s;
+        }
+        .btn-cancel:hover { background: #f8f9fa; border-color: #d1d5db; }
+        .btn-send {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: linear-gradient(135deg, #4338ca, #4f46e5);
+            color: #fff; font-size: 13px; font-weight: 600;
+            border: none; border-radius: 10px; padding: 9px 18px;
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            box-shadow: 0 3px 10px rgba(79,70,229,0.3);
+            transition: opacity 0.15s;
+        }
+        .btn-send:hover { opacity: 0.9; }
+        .btn-send svg { width: 14px; height: 14px; }
 
         /* ── Panel ── */
         .panel {
@@ -217,6 +311,20 @@
         $esAnulada = $remision->estado === 2;
     @endphp
 
+    {{-- Alertas --}}
+    @if(session('success'))
+    <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;color:#15803d;border-radius:10px;padding:12px 16px;font-size:13px;display:flex;align-items:center;gap:10px;">
+        <svg style="width:16px;height:16px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        {{ session('success') }}
+    </div>
+    @endif
+    @if(session('error'))
+    <div style="background:#fff1f2;border:1.5px solid #fecdd3;color:#be123c;border-radius:10px;padding:12px 16px;font-size:13px;display:flex;align-items:center;gap:10px;">
+        <svg style="width:16px;height:16px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+        {{ session('error') }}
+    </div>
+    @endif
+
     {{-- Header --}}
     <div class="page-header">
         <div>
@@ -228,12 +336,20 @@
         @else
             <span class="badge-estado badge-activa">Activa</span>
         @endif
-        <a href="{{ route('remisiones.pdf', [$obra, $remision]) }}" class="btn-pdf">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
-            </svg>
-            Descargar PDF
-        </a>
+        <div class="header-actions">
+            <button type="button" class="btn-email" onclick="abrirModal('modal-enviar')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+                </svg>
+                Enviar por correo
+            </button>
+            <a href="{{ route('remisiones.pdf', [$obra, $remision]) }}" class="btn-pdf">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                </svg>
+                Descargar PDF
+            </a>
+        </div>
     </div>
 
     {{-- Datos generales --}}
@@ -334,6 +450,84 @@
     </div>
 
 </main>
+
+{{-- ═══ MODAL: Enviar por correo ═══ --}}
+<div class="modal-overlay" id="modal-enviar" onclick="cerrarEnOverlay(event,'modal-enviar')">
+    <div class="modal">
+        <div class="modal-head">
+            <span class="modal-title">Enviar remisión por correo</span>
+            <button type="button" class="modal-close" onclick="cerrarModal('modal-enviar')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <form method="POST" action="{{ route('remisiones.enviar', [$obra, $remision]) }}">
+            @csrf
+            <div class="modal-body">
+
+                {{-- Grupo: Usuarios del sistema --}}
+                <div class="group-label">Usuarios del sistema</div>
+                @forelse($usuarios as $usuario)
+                @php
+                    $uNombre = trim(($usuario->persona->nombre ?? '') . ' ' . ($usuario->persona->apellido ?? ''));
+                    $uCorreo = $usuario->persona->correo ?? null;
+                @endphp
+                <label class="recipient-row" style="{{ $uCorreo ? '' : 'opacity:0.55;' }}">
+                    <input type="checkbox" name="usuarios[]" value="{{ $usuario->id }}"
+                        {{ $uCorreo ? 'checked' : 'disabled' }}>
+                    <div class="recipient-info">
+                        <span class="recipient-name">{{ $uNombre ?: $usuario->nick }}</span>
+                        @if($uCorreo)
+                            <span class="recipient-email">{{ $uCorreo }}</span>
+                        @else
+                            <span class="recipient-no-email">Sin correo registrado</span>
+                        @endif
+                    </div>
+                </label>
+                @empty
+                <p class="empty-group">No hay usuarios con envío habilitado.</p>
+                @endforelse
+
+                {{-- Grupo: Contactos de la obra --}}
+                <div class="group-label">Contactos de la obra</div>
+                @forelse($contactos as $contacto)
+                <label class="recipient-row" style="{{ $contacto->correo ? '' : 'opacity:0.55;' }}">
+                    <input type="checkbox" name="contactos[]" value="{{ $contacto->id }}"
+                        {{ $contacto->correo ? 'checked' : 'disabled' }}>
+                    <div class="recipient-info">
+                        <span class="recipient-name">{{ trim($contacto->nombre . ' ' . $contacto->apellido) }}</span>
+                        @if($contacto->correo)
+                            <span class="recipient-email">{{ $contacto->correo }}</span>
+                        @else
+                            <span class="recipient-no-email">Sin correo registrado</span>
+                        @endif
+                    </div>
+                </label>
+                @empty
+                <p class="empty-group">No hay contactos registrados para esta obra.</p>
+                @endforelse
+
+            </div>
+            <div class="modal-foot">
+                <button type="button" class="btn-cancel" onclick="cerrarModal('modal-enviar')">Cancelar</button>
+                <button type="submit" class="btn-send">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+                    </svg>
+                    Enviar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function abrirModal(id)  { document.getElementById(id).classList.add('open'); }
+    function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+    function cerrarEnOverlay(e, id) { if (e.target === document.getElementById(id)) cerrarModal(id); }
+</script>
 
 </body>
 </html>

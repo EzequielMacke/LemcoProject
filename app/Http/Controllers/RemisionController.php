@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\RemisionMail;
+use App\Models\Contacto;
 use App\Models\Obra;
 use App\Models\Probeta;
 use App\Models\Remision;
+use App\Models\Usuario;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class RemisionController extends Controller
@@ -16,7 +20,68 @@ class RemisionController extends Controller
     public function show(Obra $obra, Remision $remision): View
     {
         $remision->load(['recibidoPor.persona', 'probetas']);
-        return view('recepcion_probetas.show', compact('obra', 'remision'));
+        $usuarios  = Usuario::where('envio', 1)->with('persona')->get();
+        $contactos = Contacto::where('obra_id', $obra->id)->where('estado', 1)->get();
+        return view('recepcion_probetas.show', compact('obra', 'remision', 'usuarios', 'contactos'));
+    }
+
+    public function enviar(Request $request, Obra $obra, Remision $remision): RedirectResponse
+    {
+        $data = $request->validate([
+            'usuarios'    => 'nullable|array',
+            'usuarios.*'  => 'integer|exists:usuarios,id',
+            'contactos'   => 'nullable|array',
+            'contactos.*' => 'integer|exists:contactos,id',
+        ]);
+
+        if (empty($data['usuarios']) && empty($data['contactos'])) {
+            return back()->with('error', 'Seleccioná al menos un destinatario.');
+        }
+
+        $remision->load(['recibidoPor.persona', 'probetas']);
+
+        $logoPath = storage_path('app/private/logo/logo-web.png');
+        $logo = file_exists($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : null;
+
+        $pdfContent = Pdf::loadView('recepcion_probetas.pdf', compact('obra', 'remision', 'logo'))
+            ->setPaper('a4', 'portrait')
+            ->output();
+
+        $filename = "Obra {$obra->nombre} Remision Nro {$remision->nro}.pdf";
+
+        $destinatarios = collect();
+
+        if (!empty($data['usuarios'])) {
+            Usuario::whereIn('id', $data['usuarios'])->with('persona')->get()
+                ->each(function ($u) use (&$destinatarios) {
+                    if ($u->persona?->correo) {
+                        $destinatarios->push($u->persona->correo);
+                    }
+                });
+        }
+
+        if (!empty($data['contactos'])) {
+            Contacto::whereIn('id', $data['contactos'])->get()
+                ->each(function ($c) use (&$destinatarios) {
+                    if ($c->correo) {
+                        $destinatarios->push($c->correo);
+                    }
+                });
+        }
+
+        $destinatarios = $destinatarios->unique();
+
+        if ($destinatarios->isEmpty()) {
+            return back()->with('error', 'Los destinatarios seleccionados no tienen correo registrado.');
+        }
+
+        foreach ($destinatarios as $correo) {
+            Mail::to($correo)->send(new RemisionMail($remision, $obra, $pdfContent, $filename));
+        }
+
+        return back()->with('success', "Remisión enviada a {$destinatarios->count()} destinatario(s).");
     }
 
     public function pdf(Obra $obra, Remision $remision): Response

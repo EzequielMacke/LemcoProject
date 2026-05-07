@@ -112,8 +112,9 @@ Route::middleware(Autenticado::class)->group(function () {
         Route::post('/obras/{obra}/remisiones',        [RemisionController::class, 'store'])->name('remisiones.store');
     });
     Route::middleware('permiso:RPB')->group(function () {
-        Route::get('/obras/{obra}/remisiones/{remision}',      [RemisionController::class, 'show'])->name('remisiones.show');
-        Route::get('/obras/{obra}/remisiones/{remision}/pdf',  [RemisionController::class, 'pdf'])->name('remisiones.pdf');
+        Route::get('/obras/{obra}/remisiones/{remision}',        [RemisionController::class, 'show'])->name('remisiones.show');
+        Route::get('/obras/{obra}/remisiones/{remision}/pdf',    [RemisionController::class, 'pdf'])->name('remisiones.pdf');
+        Route::post('/obras/{obra}/remisiones/{remision}/enviar',[RemisionController::class, 'enviar'])->name('remisiones.enviar');
     });
     Route::middleware('permiso:RPB,editar')->group(function () {
         Route::get('/obras/{obra}/remisiones/{remision}/edit', [RemisionController::class, 'edit'])->name('remisiones.edit');
