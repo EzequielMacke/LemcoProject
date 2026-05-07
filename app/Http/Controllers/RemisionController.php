@@ -11,6 +11,12 @@ use Illuminate\View\View;
 
 class RemisionController extends Controller
 {
+    public function show(Obra $obra, Remision $remision): View
+    {
+        $remision->load(['recibidoPor.persona', 'probetas']);
+        return view('recepcion_probetas.show', compact('obra', 'remision'));
+    }
+
     public function create(Obra $obra): View
     {
         $ultima = Remision::where('estado', 1)->orderByDesc('nro')->value('nro');

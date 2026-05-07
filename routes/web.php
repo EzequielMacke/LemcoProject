@@ -106,6 +106,7 @@ Route::middleware(Autenticado::class)->group(function () {
     });
     Route::middleware('permiso:RPB')->group(function () {
         Route::get('/obras/{obra}/remisiones', [RemisionController::class, 'index'])->name('remisiones.index');
+        Route::get('/obras/{obra}/remisiones/{remision}', [RemisionController::class, 'show'])->name('remisiones.show');
     });
     Route::middleware('permiso:RPB,agregar')->group(function () {
         Route::get('/obras/{obra}/remisiones/create',  [RemisionController::class, 'create'])->name('remisiones.create');

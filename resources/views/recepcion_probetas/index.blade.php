@@ -216,6 +216,8 @@
             cursor: pointer; transition: all 0.15s; padding: 0;
         }
         .btn-card svg { width: 13px; height: 13px; }
+        .btn-card-ver    { border-color: #e0e7ff; color: #4f46e5; text-decoration: none; }
+        .btn-card-ver:hover    { background: #eef2ff; border-color: #a5b4fc; }
         .btn-card-editar { border-color: #e0e7ff; color: #4f46e5; text-decoration: none; }
         .btn-card-editar:hover { background: #eef2ff; border-color: #a5b4fc; }
         .btn-card-anular { border-color: #fecdd3; color: #be123c; }
@@ -456,8 +458,13 @@
                     </span>
                 @endif
 
-                @if($puedeEditar || $puedeEliminar)
                 <div class="card-actions">
+                    <a href="{{ route('remisiones.show', [$obra, $remision]) }}" class="btn-card btn-card-ver" title="Ver remisión">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </a>
                     @if(!$esAnulada && $puedeEditar)
                     <a href="{{ route('remisiones.edit', [$obra, $remision]) }}" class="btn-card btn-card-editar" title="Editar remisión">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -486,7 +493,6 @@
                     </form>
                     @endif
                 </div>
-                @endif
             </div>
         </div>
         @empty
