@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\ContactoController;
+use App\Http\Controllers\EnsayoCompresionController;
 use App\Http\Controllers\RemisionController;
 use App\Http\Controllers\ObraController;
 use App\Http\Controllers\PermisoController;
@@ -104,6 +105,10 @@ Route::middleware(Autenticado::class)->group(function () {
         Route::patch('/obras/{obra}/contactos/{contacto}/anular',  [ContactoController::class, 'anular'])->name('contactos.anular');
         Route::patch('/obras/{obra}/contactos/{contacto}/activar', [ContactoController::class, 'activar'])->name('contactos.activar');
     });
+    Route::middleware('permiso:ENS')->group(function () {
+        Route::get('/ensayos', [EnsayoCompresionController::class, 'index'])->name('ensayos.index');
+    });
+
     Route::middleware('permiso:RPB')->group(function () {
         Route::get('/obras/{obra}/remisiones', [RemisionController::class, 'index'])->name('remisiones.index');
     });

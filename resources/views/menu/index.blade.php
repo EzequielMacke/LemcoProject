@@ -117,7 +117,8 @@
             flex-direction: column;
             gap: 12px;
             position: relative;
-            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            aspect-ratio: 1 / 1.18;
             transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             animation: fadeUp 0.4s ease both;
@@ -127,6 +128,7 @@
         .menu-card:nth-child(3) { animation-delay: 0.18s; }
         .menu-card:nth-child(4) { animation-delay: 0.24s; }
         .menu-card:nth-child(5) { animation-delay: 0.30s; }
+        .menu-card:nth-child(6) { animation-delay: 0.36s; }
 
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(12px); }
@@ -154,6 +156,7 @@
         .card-usuarios::before { background: #0e7490; }
         .card-obras::before    { background: #ea580c; }
         .card-envios::before   { background: #7c3aed; }
+        .card-ensayos::before  { background: #e11d48; }
 
         /* Ícono */
         .card-icon {
@@ -171,6 +174,7 @@
         .icon-usuarios { background: #f0f9ff; color: #0e7490; }
         .icon-obras    { background: #fff7ed; color: #ea580c; }
         .icon-envios   { background: #f5f3ff; color: #7c3aed; }
+        .icon-ensayos  { background: #fff1f2; color: #e11d48; }
 
         /* Texto — crece para llenar el espacio */
         .card-body { flex: 1; min-height: 0; }
@@ -436,6 +440,28 @@
             <div class="card-body">
                 <div class="card-label">Obras</div>
                 <div class="card-desc">Seguimiento y gestión de proyectos y obras</div>
+            </div>
+            <div class="card-foot">
+                <span class="card-foot-label">Módulo</span>
+                <div class="card-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+        @endpermiso
+
+        @permiso('ENS')
+        <a href="{{ route('ensayos.index') }}" class="menu-card card-ensayos">
+            <div class="card-icon icon-ensayos">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
+                </svg>
+            </div>
+            <div class="card-body">
+                <div class="card-label">Compresión</div>
+                <div class="card-desc">Registro y gestión de ensayos de compresión</div>
             </div>
             <div class="card-foot">
                 <span class="card-foot-label">Módulo</span>
