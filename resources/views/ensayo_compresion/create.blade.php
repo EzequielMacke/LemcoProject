@@ -119,33 +119,32 @@
         tbody tr { border-bottom: 1px solid #f1f3f5; transition: background 0.1s; }
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background: #fafbff; }
-        tbody tr.row-guardada { opacity: 0.65; }
         td { padding: 9px 14px; vertical-align: middle; color: #374151; }
         td.cell-obra   { font-weight: 600; color: #111827; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
         td.cell-nombre { font-weight: 500; }
         td.cell-center { text-align: center; }
-        td.cell-val    { font-variant-numeric: tabular-nums; }
-        td.cell-dash   { color: #d1d5db; }
 
         /* ── Inputs ── */
         .f-text {
             width: 120px; padding: 5px 9px;
             border: 1.5px solid #e9ecef; border-radius: 7px;
             font-size: 12.5px; font-family: 'Inter', sans-serif;
-            color: #374151; background: #fff; transition: border-color 0.15s, background 0.15s;
+            color: #374151; background: #fff;
+            transition: border-color 0.15s, background 0.15s;
         }
         .f-num {
             width: 76px; padding: 5px 9px;
             border: 1.5px solid #e9ecef; border-radius: 7px;
             font-size: 12.5px; font-family: 'Inter', sans-serif;
-            color: #374151; background: #fff; transition: border-color 0.15s, background 0.15s;
-            text-align: right;
+            color: #374151; background: #fff; text-align: right;
+            transition: border-color 0.15s, background 0.15s;
         }
         .f-select {
             width: 68px; padding: 5px 6px;
             border: 1.5px solid #e9ecef; border-radius: 7px;
             font-size: 12.5px; font-family: 'Inter', sans-serif;
-            color: #374151; background: #fff; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+            color: #374151; background: #fff; cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
         }
         .f-text:focus, .f-num:focus, .f-select:focus { outline: none; border-color: #93c5fd; }
         .f-text::placeholder, .f-num::placeholder { color: #d1d5db; }
@@ -153,6 +152,15 @@
             background: #f9fafb; color: #9ca3af; cursor: not-allowed;
         }
         .f-error { border-color: #f87171 !important; background: #fff5f5 !important; }
+
+        /* ── Estado guardando / guardado ── */
+        .f-saving { border-color: #93c5fd !important; opacity: 0.6; }
+
+        @keyframes flashSaved {
+            0%   { border-color: #34d399; background: #ecfdf5; }
+            100% { border-color: #e9ecef; background: #fff; }
+        }
+        .f-saved { animation: flashSaved 0.9s ease forwards; }
 
         /* ── Flash al copiar ── */
         @keyframes flashCopy {
@@ -173,36 +181,6 @@
         .btn-copy:hover { border-color: #bfdbfe; background: #eff6ff; color: #1d4ed8; }
         .btn-copy svg { width: 11px; height: 11px; pointer-events: none; }
         .btn-copy--ok { border-color: #bbf7d0 !important; background: #f0fdf4 !important; color: #15803d !important; }
-
-        /* ── Botones acción ── */
-        .btn-save {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 6px 14px; border-radius: 8px;
-            border: 1.5px solid #bfdbfe; background: #eff6ff;
-            color: #1d4ed8; font-size: 12.5px; font-weight: 600;
-            font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.15s;
-            white-space: nowrap;
-        }
-        .btn-save:hover:not(:disabled) { background: #dbeafe; border-color: #93c5fd; }
-        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
-        .btn-save svg { width: 12px; height: 12px; flex-shrink: 0; }
-
-        .btn-guardado {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 6px 14px; border-radius: 8px;
-            border: 1px solid #bbf7d0; background: #f0fdf4;
-            color: #15803d; font-size: 12.5px; font-weight: 600;
-            font-family: 'Inter', sans-serif; cursor: default; white-space: nowrap;
-        }
-        .btn-guardado svg { width: 12px; height: 12px; flex-shrink: 0; }
-
-        /* ── Spinner ── */
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .spinner {
-            display: inline-block; width: 12px; height: 12px; flex-shrink: 0;
-            border: 2px solid #bfdbfe; border-top-color: #1d4ed8;
-            border-radius: 50%; animation: spin 0.6s linear infinite;
-        }
 
         /* ── Toast error ── */
         .toast-error {
@@ -286,6 +264,10 @@
         </button>
     </div>
 
+    @php
+        $copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
+    @endphp
+
     {{-- Tab: Por ensayar --}}
     <div id="tab-pendientes" class="tab-content active">
         @if($pendientes->isEmpty())
@@ -307,7 +289,6 @@
                             <th class="th-center">Alt 1</th>
                             <th class="th-center">Alt 2</th>
                             <th class="th-center">Alt 3</th>
-                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -318,21 +299,13 @@
                             <td>
                                 <div class="cell-group">
                                     <input type="text" class="f-text" data-field="defecto" placeholder="Sin defecto" value="{{ $probeta->defecto ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="carga_rotura" placeholder="kN" value="{{ $probeta->carga_rotura ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
@@ -343,90 +316,50 @@
                                             <option value="{{ $t }}" @selected($probeta->tipo_rotura == $t)>{{ $t }}</option>
                                         @endfor
                                     </select>
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_superior_1" placeholder="mm" value="{{ $probeta->diametro_superior_1 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_superior_2" placeholder="mm" value="{{ $probeta->diametro_superior_2 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_inferior_1" placeholder="mm" value="{{ $probeta->diametro_inferior_1 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_inferior_2" placeholder="mm" value="{{ $probeta->diametro_inferior_2 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="altura_1" placeholder="mm" value="{{ $probeta->altura_1 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="altura_2" placeholder="mm" value="{{ $probeta->altura_2 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="altura_3" placeholder="mm" value="{{ $probeta->altura_3 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
-                            </td>
-                            <td>
-                                <button type="button" class="btn-save">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
-                                    </svg>
-                                    Guardar
-                                </button>
                             </td>
                         </tr>
                         @endforeach
@@ -457,32 +390,23 @@
                             <th class="th-center">Alt 1</th>
                             <th class="th-center">Alt 2</th>
                             <th class="th-center">Alt 3</th>
-                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($ensayadas as $probeta)
-                        <tr data-id="{{ $probeta->id }}" data-ensayada="true">
+                        <tr data-id="{{ $probeta->id }}">
                             <td class="cell-obra">{{ $probeta->remision->obra->nombre ?? '—' }}</td>
                             <td class="cell-nombre">{{ $probeta->nombre }}</td>
                             <td>
                                 <div class="cell-group">
                                     <input type="text" class="f-text" data-field="defecto" placeholder="Sin defecto" value="{{ $probeta->defecto ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="carga_rotura" placeholder="kN" value="{{ $probeta->carga_rotura ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
@@ -493,90 +417,50 @@
                                             <option value="{{ $t }}" @selected($probeta->tipo_rotura == $t)>{{ $t }}</option>
                                         @endfor
                                     </select>
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_superior_1" placeholder="mm" value="{{ $probeta->diametro_superior_1 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_superior_2" placeholder="mm" value="{{ $probeta->diametro_superior_2 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_inferior_1" placeholder="mm" value="{{ $probeta->diametro_inferior_1 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_inferior_2" placeholder="mm" value="{{ $probeta->diametro_inferior_2 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="altura_1" placeholder="mm" value="{{ $probeta->altura_1 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="altura_2" placeholder="mm" value="{{ $probeta->altura_2 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="altura_3" placeholder="mm" value="{{ $probeta->altura_3 ?? '' }}">
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
-                            </td>
-                            <td>
-                                <button type="button" class="btn-save">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
-                                    </svg>
-                                    Guardar
-                                </button>
                             </td>
                         </tr>
                         @endforeach
@@ -597,10 +481,9 @@
 </div>
 
 <script>
-const CSRF = document.querySelector('meta[name="csrf-token"]').content;
-
-const SVG_CHECK = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>`;
-const SVG_SAVE  = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>`;
+const CSRF     = document.querySelector('meta[name="csrf-token"]').content;
+const timers   = new Map();
+const DEBOUNCE = 500;
 
 function switchTab(tab, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -616,43 +499,50 @@ function showToast(msg) {
     setTimeout(() => t.classList.remove('show'), 4000);
 }
 
-document.addEventListener('click', function (e) {
-    /* ── Copiar columna ── */
+/* ── Copiar columna ── */
+document.addEventListener('click', function(e) {
     const copyBtn = e.target.closest('.btn-copy');
-    if (copyBtn) {
-        const source = copyBtn.closest('.cell-group').querySelector('[data-field]');
-        if (!source || source.disabled) return;
+    if (!copyBtn) return;
 
-        const field = source.dataset.field;
-        const value = source.value;
-        const tbody = copyBtn.closest('tbody');
+    const source = copyBtn.closest('.cell-group').querySelector('[data-field]');
+    if (!source || source.disabled) return;
 
-        let copied = 0;
-        tbody.querySelectorAll(`[data-field="${field}"]`).forEach(el => {
-            if (el === source || el.disabled) return;
-            el.value = value;
-            el.classList.remove('f-error', 'f-copied');
-            void el.offsetWidth; // reinicia la animación si ya estaba corriendo
-            el.classList.add('f-copied');
-            copied++;
-        });
+    const field  = source.dataset.field;
+    const value  = source.value;
+    const tbody  = copyBtn.closest('tbody');
+    let   copied = 0;
 
-        if (copied > 0) {
-            copyBtn.classList.add('btn-copy--ok');
-            setTimeout(() => copyBtn.classList.remove('btn-copy--ok'), 700);
-        }
-        return;
+    tbody.querySelectorAll(`[data-field="${field}"]`).forEach(el => {
+        if (el === source || el.disabled) return;
+        el.value = value;
+        el.classList.remove('f-error', 'f-copied');
+        void el.offsetWidth;
+        el.classList.add('f-copied');
+        const r = el.closest('tr[data-id]');
+        if (r) scheduleGuardar(r, el);
+        copied++;
+    });
+
+    if (copied > 0) {
+        copyBtn.classList.add('btn-copy--ok');
+        setTimeout(() => copyBtn.classList.remove('btn-copy--ok'), 700);
     }
-
-    /* ── Guardar fila ── */
-    const saveBtn = e.target.closest('.btn-save');
-    if (!saveBtn || saveBtn.disabled) return;
-
-    guardarFila(saveBtn);
 });
 
-async function guardarFila(btn) {
-    const row    = btn.closest('tr');
+/* ── Auto-guardar al cambiar un campo ── */
+document.addEventListener('change', function(e) {
+    const input = e.target.closest('[data-field]');
+    if (!input || input.disabled) return;
+    const row = input.closest('tr[data-id]');
+    if (row) scheduleGuardar(row, input);
+});
+
+function scheduleGuardar(row, changedEl) {
+    clearTimeout(timers.get(row.dataset.id));
+    timers.set(row.dataset.id, setTimeout(() => guardarFila(row, changedEl), DEBOUNCE));
+}
+
+async function guardarFila(row, changedEl) {
     const id     = row.dataset.id;
     const inputs = row.querySelectorAll('[data-field]');
 
@@ -664,8 +554,7 @@ async function guardarFila(btn) {
         data[field] = val === '' ? null : (el.type === 'number' ? parseFloat(val) : val);
     });
 
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner"></span> Guardando…`;
+    changedEl?.classList.add('f-saving');
 
     try {
         const res = await fetch(`/ensayos/${id}`, {
@@ -678,34 +567,30 @@ async function guardarFila(btn) {
             body: JSON.stringify(data),
         });
 
+        changedEl?.classList.remove('f-saving');
+
         if (!res.ok) {
             const payload = await res.json().catch(() => ({}));
             if (payload.errors) {
                 Object.keys(payload.errors).forEach(f => {
                     row.querySelector(`[data-field="${f}"]`)?.classList.add('f-error');
                 });
-                showToast('Revisá los campos marcados en rojo.');
+                showToast('Error al guardar. Revisá los campos marcados.');
             } else {
-                showToast('Ocurrió un error al guardar. Intentá de nuevo.');
+                showToast('Error al guardar. Intentá de nuevo.');
             }
-            btn.disabled = false;
-            btn.innerHTML = SVG_SAVE + ' Guardar';
             return;
         }
 
-        // En ambos casos: mostrar éxito 2s y volver a editable
-        btn.innerHTML = SVG_CHECK + ' Guardado';
-        btn.style.cssText = 'border-color:#bbf7d0;background:#f0fdf4;color:#15803d;';
-        setTimeout(() => {
-            btn.disabled      = false;
-            btn.innerHTML     = SVG_SAVE + ' Guardar';
-            btn.style.cssText = '';
-        }, 2000);
+        if (changedEl) {
+            changedEl.classList.remove('f-copied');
+            changedEl.classList.add('f-saved');
+            setTimeout(() => changedEl.classList.remove('f-saved'), 900);
+        }
 
     } catch {
-        showToast('Error de conexión. Intentá de nuevo.');
-        btn.disabled = false;
-        btn.innerHTML = SVG_SAVE + ' Guardar';
+        changedEl?.classList.remove('f-saving');
+        showToast('Error de conexión.');
     }
 }
 </script>
