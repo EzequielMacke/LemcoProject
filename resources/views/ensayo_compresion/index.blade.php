@@ -184,6 +184,17 @@
             .badge { padding: 4px 9px; font-size: 12px; }
         }
 
+        /* ── Día clickable ── */
+        a.agenda-day {
+            text-decoration: none; cursor: pointer; color: inherit;
+        }
+        a.agenda-day:hover {
+            box-shadow: 0 4px 14px rgba(0,0,0,0.09);
+            transform: translateY(-1px);
+        }
+        a.agenda-day .agenda-nombre,
+        a.agenda-day .agenda-vacio-txt { color: inherit; }
+
         @media (max-width: 380px) {
             .navbar { padding: 0 10px; }
             .page { padding: 10px; gap: 10px; }
@@ -214,15 +225,6 @@
             <div class="user-chip">{{ strtoupper(substr(session('usuario.nick'), 0, 1)) }}</div>
             <span class="user-name">{{ session('usuario.nick') }}</span>
         </div>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="btn-logout">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
-                </svg>
-                <span>Cerrar sesión</span>
-            </button>
-        </form>
     </div>
 </nav>
 
@@ -300,7 +302,11 @@
                 else                      $cls .= ' dia-mixto';
             @endphp
 
+            @if($hayDatos)
+            <a href="{{ route('ensayos.create', ['fecha' => $celda['fecha']]) }}" class="{{ $cls }}">
+            @else
             <div class="{{ $cls }}">
+            @endif
                 <div class="agenda-fecha">
                     <div class="agenda-num">{{ $celda['dia'] }}</div>
                     <span class="agenda-nombre">{{ $nombresDia[$diaSem] }}</span>
@@ -315,7 +321,7 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
                                 </svg>
-                                {{ $datos['ensayadas'] }} ensayada{{ $datos['ensayadas'] !== 1 ? 's' : '' }}
+                                {{ $datos['ensayadas'] }} Ensayada{{ $datos['ensayadas'] !== 1 ? 's' : '' }}
                             </span>
                         @endif
                         @if($datos['porEnsayar'] > 0)
@@ -323,14 +329,18 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                {{ $datos['porEnsayar'] }} pendiente{{ $datos['porEnsayar'] !== 1 ? 's' : '' }}
+                                {{ $datos['porEnsayar'] }} Pendiente{{ $datos['porEnsayar'] !== 1 ? 's' : '' }}
                             </span>
                         @endif
                     @else
                         <span class="agenda-vacio-txt">Sin ensayos programados</span>
                     @endif
                 </div>
+            @if($hayDatos)
+            </a>
+            @else
             </div>
+            @endif
         @endforeach
     </div>
 

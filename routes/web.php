@@ -106,7 +106,9 @@ Route::middleware(Autenticado::class)->group(function () {
         Route::patch('/obras/{obra}/contactos/{contacto}/activar', [ContactoController::class, 'activar'])->name('contactos.activar');
     });
     Route::middleware('permiso:ENS')->group(function () {
-        Route::get('/ensayos', [EnsayoCompresionController::class, 'index'])->name('ensayos.index');
+        Route::get('/ensayos',          [EnsayoCompresionController::class, 'index'])->name('ensayos.index');
+        Route::get('/ensayos/{fecha}',  [EnsayoCompresionController::class, 'create'])->name('ensayos.create');
+        Route::patch('/ensayos/{probeta}', [EnsayoCompresionController::class, 'store'])->name('ensayos.store');
     });
 
     Route::middleware('permiso:RPB')->group(function () {

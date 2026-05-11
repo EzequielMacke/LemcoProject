@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Probeta;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -66,6 +67,46 @@ class EnsayoCompresionController extends Controller
             'mes', 'anio', 'celdas', 'datosPorDia', 'hoy',
             'prevMes', 'prevAnio', 'nextMes', 'nextAnio'
         ));
+    }
+
+    public function create(string $fecha): View
+    {
+        $fecha = Carbon::parse($fecha)->format('Y-m-d');
+
+        $probetas = Probeta::with('remision.obra')
+            ->whereRaw(
+                'DATE_ADD(fecha_moldeo, INTERVAL edad_ensayo DAY) = ?',
+                [$fecha]
+            )
+            ->get();
+
+        $pendientes = $probetas->filter(fn($p) => !$this->estaEnsayada($p))->values();
+        $ensayadas  = $probetas->filter(fn($p) =>  $this->estaEnsayada($p))->values();
+
+        return view('ensayo_compresion.create', compact('fecha', 'pendientes', 'ensayadas'));
+    }
+
+    public function store(Request $request, Probeta $probeta): JsonResponse
+    {
+        $validated = $request->validate([
+            'defecto'             => ['nullable', 'string', 'max:255'],
+            'carga_rotura'        => ['nullable', 'numeric', 'min:0'],
+            'tipo_rotura'         => ['nullable', 'integer', 'between:1,6'],
+            'diametro_superior_1' => ['nullable', 'numeric', 'min:0'],
+            'diametro_superior_2' => ['nullable', 'numeric', 'min:0'],
+            'diametro_inferior_1' => ['nullable', 'numeric', 'min:0'],
+            'diametro_inferior_2' => ['nullable', 'numeric', 'min:0'],
+            'altura_1'            => ['nullable', 'numeric', 'min:0'],
+            'altura_2'            => ['nullable', 'numeric', 'min:0'],
+            'altura_3'            => ['nullable', 'numeric', 'min:0'],
+        ]);
+
+        $validated['fecha_ensayo'] = now()->toDateString();
+        $validated['ensayo_por']   = session('usuario.id');
+
+        $probeta->update($validated);
+
+        return response()->json(['ok' => true]);
     }
 
     private function estaEnsayada(Probeta $probeta): bool
