@@ -97,6 +97,16 @@
         .btn-hoy:hover { background: #dbeafe; border-color: #93c5fd; }
         .btn-hoy svg { width: 14px; height: 14px; }
 
+        .btn-pdf-dia {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 7px;
+            border: 1.5px solid #fca5a5; background: #fef2f2;
+            color: #dc2626; font-size: 12px; font-weight: 600;
+            text-decoration: none; transition: all 0.15s; flex-shrink: 0;
+        }
+        .btn-pdf-dia:hover { background: #fee2e2; border-color: #f87171; }
+        .btn-pdf-dia svg { width: 11px; height: 11px; flex-shrink: 0; }
+
         .leyenda { display: flex; align-items: center; gap: 14px; }
         .leyenda-item { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #6b7280; }
         .leyenda-dot { width: 10px; height: 10px; border-radius: 50%; }
@@ -185,15 +195,11 @@
         }
 
         /* ── Día clickable ── */
-        a.agenda-day {
-            text-decoration: none; cursor: pointer; color: inherit;
-        }
-        a.agenda-day:hover {
+        .agenda-day.dia-link { cursor: pointer; }
+        .agenda-day.dia-link:hover {
             box-shadow: 0 4px 14px rgba(0,0,0,0.09);
             transform: translateY(-1px);
         }
-        a.agenda-day .agenda-nombre,
-        a.agenda-day .agenda-vacio-txt { color: inherit; }
 
         @media (max-width: 380px) {
             .navbar { padding: 0 10px; }
@@ -269,6 +275,7 @@
                 <span>Hoy</span>
             </a>
 
+
             <div class="leyenda">
                 <div class="leyenda-item"><div class="leyenda-dot ensayadas"></div>Ensayadas</div>
                 <div class="leyenda-item"><div class="leyenda-dot porEnsayar"></div>Por ensayar</div>
@@ -302,11 +309,9 @@
                 else                      $cls .= ' dia-mixto';
             @endphp
 
-            @if($hayDatos)
-            <a href="{{ route('ensayos.create', ['fecha' => $celda['fecha']]) }}" class="{{ $cls }}">
-            @else
-            <div class="{{ $cls }}">
-            @endif
+            <div class="{{ $cls }}{{ $hayDatos ? ' dia-link' : '' }}"
+                 @if($hayDatos) onclick="location.href='{{ route('ensayos.create', ['fecha' => $celda['fecha']]) }}'" @endif>
+
                 <div class="agenda-fecha">
                     <div class="agenda-num">{{ $celda['dia'] }}</div>
                     <span class="agenda-nombre">{{ $nombresDia[$diaSem] }}</span>
@@ -332,15 +337,22 @@
                                 {{ $datos['porEnsayar'] }} Pendiente{{ $datos['porEnsayar'] !== 1 ? 's' : '' }}
                             </span>
                         @endif
+                        @if($datos['ensayadas'] > 0)
+                            <a href="{{ route('ensayos.pdf-todas', ['fecha' => $celda['fecha']]) }}"
+                               class="btn-pdf-dia"
+                               onclick="event.stopPropagation()"
+                               title="Descargar PDF de resultados">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                                </svg>
+                                PDF
+                            </a>
+                        @endif
                     @else
                         <span class="agenda-vacio-txt">Sin ensayos programados</span>
                     @endif
                 </div>
-            @if($hayDatos)
-            </a>
-            @else
             </div>
-            @endif
         @endforeach
     </div>
 

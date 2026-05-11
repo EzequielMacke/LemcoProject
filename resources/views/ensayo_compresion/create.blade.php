@@ -278,7 +278,7 @@
                     <thead>
                         <tr>
                             <th>Obra</th>
-                            <th>Nombre</th>
+                            <th>Muestra</th>
                             <th>Defecto</th>
                             <th class="th-center">Carga Rotura</th>
                             <th class="th-center">Tipo Rotura</th>
@@ -379,7 +379,7 @@
                     <thead>
                         <tr>
                             <th>Obra</th>
-                            <th>Nombre</th>
+                            <th>Muestra</th>
                             <th>Defecto</th>
                             <th class="th-center">Carga Rotura</th>
                             <th class="th-center">Tipo Rotura</th>
