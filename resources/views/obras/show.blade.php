@@ -139,17 +139,21 @@
             grid-template-columns: repeat(auto-fill, 190px);
             justify-content: start;
             gap: 14px;
-            animation: fadeUp 0.4s ease 0.1s both;
         }
 
         .menu-card {
             background: #fff; border: 1.5px solid #e9ecef; border-radius: 18px;
             padding: 24px 22px 20px; text-decoration: none;
             display: flex; flex-direction: column; gap: 12px;
-            position: relative; aspect-ratio: 1 / 1;
+            position: relative; overflow: hidden; aspect-ratio: 1 / 1.18;
             transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            animation: fadeUp 0.4s ease both;
         }
+        .menu-card:nth-child(1) { animation-delay: 0.06s; }
+        .menu-card:nth-child(2) { animation-delay: 0.12s; }
+        .menu-card:nth-child(3) { animation-delay: 0.18s; }
+        .menu-card:nth-child(4) { animation-delay: 0.24s; }
         .menu-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(0,0,0,0.08);
@@ -301,38 +305,40 @@
             /* Cards aplastadas en fila */
             .cards-grid {
                 grid-template-columns: 1fr;
-                gap: 8px;
+                gap: 12px;
             }
             .menu-card {
                 flex-direction: row;
                 align-items: center;
                 aspect-ratio: unset;
-                padding: 12px 14px;
-                gap: 12px;
-                border-radius: 12px;
+                padding: 18px 18px;
+                gap: 16px;
+                border-radius: 14px;
             }
             /* Acento pasa a barra izquierda */
             .menu-card::before {
-                top: 10px; bottom: 10px;
+                top: 14px; bottom: 14px;
                 left: 0; right: auto;
                 width: 3px; height: auto;
-                border-radius: 0 3px 3px 0;
+                border-radius: 0 4px 4px 0;
+                transition: none;
             }
-            .menu-card:hover::before { top: 6px; bottom: 6px; left: 0; right: auto; }
+            .menu-card:hover::before { left: 0; right: auto; }
 
             .card-icon {
-                width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+                width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
             }
-            .card-icon svg { width: 18px; height: 18px; }
+            .card-icon svg { width: 20px; height: 20px; }
 
-            .card-body { flex: 1; min-height: 0; }
-            .card-label { font-size: 14px; margin-bottom: 1px; }
+            .card-body { flex: 1; }
+            .card-label { font-size: 14px; margin-bottom: 3px; }
             .card-desc  { font-size: 12px; }
 
-            .card-foot { flex-shrink: 0; }
+            .card-foot { flex-direction: column; align-items: flex-end; gap: 4px; }
             .card-foot-label { display: none; }
-            .card-arrow { width: 26px; height: 26px; }
-            .card-arrow svg { width: 11px; height: 11px; }
+
+            .menu-card:hover { transform: none; }
+            .menu-card:hover .card-icon { transform: none; }
         }
     </style>
 </head>
@@ -493,26 +499,6 @@
             </div>
         </a>
         @endpermiso
-
-        <a href="#" class="menu-card card-certificados">
-            <div class="card-icon icon-certificados">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"/>
-                </svg>
-            </div>
-            <div class="card-body">
-                <div class="card-label">Certificados</div>
-                <div class="card-desc">Documentos y certificaciones emitidas</div>
-            </div>
-            <div class="card-foot">
-                <span class="card-foot-label">Sección</span>
-                <div class="card-arrow">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
-                    </svg>
-                </div>
-            </div>
-        </a>
 
     </div>
 
