@@ -193,6 +193,7 @@ class EnsayoCompresionController extends Controller
         ]);
 
         $campos = [
+            'defecto',
             'carga_rotura', 'tipo_rotura',
             'diametro_superior_1', 'diametro_superior_2',
             'diametro_inferior_1', 'diametro_inferior_2',
@@ -218,7 +219,11 @@ class EnsayoCompresionController extends Controller
 
     private function estaEnsayada(Probeta $probeta): bool
     {
-        return $probeta->fecha_ensayo        !== null
+        if ($probeta->fecha_ensayo === null || $probeta->ensayo_por === null) {
+            return false;
+        }
+
+        return $probeta->defecto              !== null
             && $probeta->carga_rotura        !== null
             && $probeta->tipo_rotura         !== null
             && $probeta->diametro_superior_1 !== null
@@ -227,7 +232,6 @@ class EnsayoCompresionController extends Controller
             && $probeta->diametro_inferior_2 !== null
             && $probeta->altura_1            !== null
             && $probeta->altura_2            !== null
-            && $probeta->altura_3            !== null
-            && $probeta->ensayo_por          !== null;
+            && $probeta->altura_3            !== null;
     }
 }

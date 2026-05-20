@@ -172,6 +172,7 @@
         .card-contactos::before    { background: #0d9488; }
         .card-probetas::before     { background: #4f46e5; }
         .card-certificados::before { background: #059669; }
+        .card-informes::before     { background: #d97706; }
 
         .card-icon {
             width: 48px; height: 48px; border-radius: 13px;
@@ -184,6 +185,7 @@
         .icon-contactos    { background: #f0fdfa; color: #0d9488; }
         .icon-probetas     { background: #eef2ff; color: #4f46e5; }
         .icon-certificados { background: #ecfdf5; color: #059669; }
+        .icon-informes     { background: #fffbeb; color: #d97706; }
 
         .card-body { flex: 1; min-height: 0; }
         .card-label { font-size: 15px; font-weight: 700; color: #111827; letter-spacing: -0.2px; margin-bottom: 5px; }
@@ -488,6 +490,28 @@
             <div class="card-body">
                 <div class="card-label">Recepción de probetas</div>
                 <div class="card-desc">Registro y seguimiento de muestras</div>
+            </div>
+            <div class="card-foot">
+                <span class="card-foot-label">Sección</span>
+                <div class="card-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+        @endpermiso
+
+        @permiso('INF')
+        <a href="{{ route('informes.index', $obra) }}" class="menu-card card-informes">
+            <div class="card-icon icon-informes">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                </svg>
+            </div>
+            <div class="card-body">
+                <div class="card-label">Informes</div>
+                <div class="card-desc">Generación y gestión de informes de ensayo</div>
             </div>
             <div class="card-foot">
                 <span class="card-foot-label">Sección</span>

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\EnsayoCompresionController;
+use App\Http\Controllers\InformeController;
 use App\Http\Controllers\RemisionController;
 use App\Http\Controllers\ObraController;
 use App\Http\Controllers\PermisoController;
@@ -111,6 +112,24 @@ Route::middleware(Autenticado::class)->group(function () {
         Route::get('/ensayos/{fecha}/pdf',           [EnsayoCompresionController::class, 'pdfTodas'])->name('ensayos.pdf-todas');
         Route::get('/ensayos/{fecha}',               [EnsayoCompresionController::class, 'create'])->name('ensayos.create');
         Route::patch('/ensayos/{probeta}',           [EnsayoCompresionController::class, 'store'])->name('ensayos.store');
+    });
+
+    Route::middleware('permiso:INF')->group(function () {
+        Route::get('/obras/{obra}/informes',                                   [InformeController::class, 'index'])->name('informes.index');
+        Route::get('/obras/{obra}/informes/pendientes/{remision}',             [InformeController::class, 'crear'])->name('informes.crear');
+        Route::get('/obras/{obra}/informes/{informe}',                         [InformeController::class, 'show'])->name('informes.show');
+        Route::get('/obras/{obra}/informes/{informe}/pdf',                     [InformeController::class, 'pdf'])->name('informes.pdf');
+    });
+    Route::middleware('permiso:INF,editar')->group(function () {
+        Route::patch('/obras/{obra}/informes/{informe}/verificar',             [InformeController::class, 'verificar'])->name('informes.verificar');
+        Route::patch('/obras/{obra}/informes/{informe}/pendiente',             [InformeController::class, 'marcarPendiente'])->name('informes.pendiente');
+        Route::post('/obras/{obra}/informes/{informe}/enviar',                 [InformeController::class, 'enviar'])->name('informes.enviar');
+    });
+    Route::middleware('permiso:INF,agregar')->group(function () {
+        Route::post('/obras/{obra}/informes',                                  [InformeController::class, 'store'])->name('informes.store');
+    });
+    Route::middleware('permiso:INF,eliminar')->group(function () {
+        Route::delete('/obras/{obra}/informes/{informe}',                      [InformeController::class, 'destroy'])->name('informes.destroy');
     });
 
     Route::middleware('permiso:RPB')->group(function () {
