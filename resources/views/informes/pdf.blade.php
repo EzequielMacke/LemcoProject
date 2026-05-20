@@ -319,7 +319,7 @@
     </div>
     @endif
     <div style="font-style:italic;">
-        No se deben reproducir el informe completo ni parte del mismo sin la expresa autorización del laboratorio LEMCO.
+        No se debe reproducir el informe completo ni parte del mismo sin la expresa autorización del laboratorio LEMCO.
     </div>
 </div>
 
