@@ -167,9 +167,33 @@ class RemisionController extends Controller
         return $remision->probetas()->whereHas('detalles')->exists();
     }
 
+    private function tieneProvetasEnsayadas(Remision $remision): bool
+    {
+        return $remision->probetas()
+            ->whereNotNull('fecha_ensayo')
+            ->whereNotNull('ensayo_por')
+            ->whereNotNull('defecto')
+            ->whereNotNull('carga_rotura')
+            ->whereNotNull('tipo_rotura')
+            ->whereNotNull('diametro_superior_1')
+            ->whereNotNull('diametro_superior_2')
+            ->whereNotNull('diametro_inferior_1')
+            ->whereNotNull('diametro_inferior_2')
+            ->whereNotNull('altura_1')
+            ->whereNotNull('altura_2')
+            ->whereNotNull('altura_3')
+            ->exists();
+    }
+
+    private function remisionBloqueada(Remision $remision): bool
+    {
+        return $this->remisionBloqueada($remision)
+            || $this->tieneProvetasEnsayadas($remision);
+    }
+
     public function edit(Obra $obra, Remision $remision): View
     {
-        if ($this->tieneProvetasEnInforme($remision)) {
+        if ($this->remisionBloqueada($remision)) {
             abort(403, 'La remisión no se puede editar porque tiene probetas incluidas en un informe.');
         }
         $grupos = $remision->probetas()
@@ -192,7 +216,7 @@ class RemisionController extends Controller
 
     public function update(Request $request, Obra $obra, Remision $remision): RedirectResponse
     {
-        if ($this->tieneProvetasEnInforme($remision)) {
+        if ($this->remisionBloqueada($remision)) {
             return redirect()->route('remisiones.index', $obra)
                 ->with('error', 'La remisión no se puede editar porque tiene probetas incluidas en un informe.');
         }
@@ -270,7 +294,7 @@ class RemisionController extends Controller
 
     public function anular(Obra $obra, Remision $remision): RedirectResponse
     {
-        if ($this->tieneProvetasEnInforme($remision)) {
+        if ($this->remisionBloqueada($remision)) {
             return back()->with('error', 'La remisión no se puede anular porque tiene probetas incluidas en un informe.');
         }
 

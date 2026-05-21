@@ -427,7 +427,16 @@
                 ? trim($creador->persona->nombre . ' ' . $creador->persona->apellido)
                 : ($creador->nick ?? '—');
             $esAnulada  = $remision->estado === 2;
-            $bloqueada  = $remision->probetas->some(fn($p) => $p->detalles->isNotEmpty());
+            $bloqueada  = $remision->probetas->some(fn($p) =>
+                $p->detalles->isNotEmpty() || (
+                    $p->fecha_ensayo !== null && $p->ensayo_por !== null &&
+                    $p->defecto !== null && $p->carga_rotura !== null &&
+                    $p->tipo_rotura !== null &&
+                    $p->diametro_superior_1 !== null && $p->diametro_superior_2 !== null &&
+                    $p->diametro_inferior_1 !== null && $p->diametro_inferior_2 !== null &&
+                    $p->altura_1 !== null && $p->altura_2 !== null && $p->altura_3 !== null
+                )
+            );
         @endphp
         <div
             class="remision-card {{ $esAnulada ? 'anulada' : '' }}"

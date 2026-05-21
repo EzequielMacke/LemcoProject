@@ -331,7 +331,6 @@
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="carga_rotura" placeholder="kN" value="{{ $probeta->carga_rotura ?? '' }}" {{ $locked ? 'disabled' : '' }}>
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
@@ -441,7 +440,6 @@
                             <td class="cell-center">
                                 <div class="cell-group">
                                     <input type="number" step="0.01" min="0" class="f-num" data-field="carga_rotura" placeholder="kN" value="{{ $probeta->carga_rotura ?? '' }}" {{ $locked ? 'disabled' : '' }}>
-                                    <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
