@@ -192,6 +192,23 @@
         .toast-error.show { display: flex; align-items: center; gap: 8px; animation: slideUp 0.2s ease; }
         @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+        /* ── Fila bloqueada (ya en informe) ── */
+        tr.row-locked td { background: #f8fafc !important; }
+        tr.row-locked .f-text,
+        tr.row-locked .f-num,
+        tr.row-locked .f-select {
+            background: #f1f3f5 !important; color: #9ca3af !important;
+            cursor: not-allowed !important; border-color: #e9ecef !important;
+        }
+        tr.row-locked .btn-copy { display: none; }
+        .badge-informe {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px;
+            background: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe;
+            white-space: nowrap;
+        }
+        .badge-informe svg { width: 11px; height: 11px; flex-shrink: 0; }
+
         /* ── Responsive ── */
         @media (max-width: 768px) {
             .page { padding: 16px; gap: 16px; }
@@ -293,24 +310,33 @@
                     </thead>
                     <tbody>
                         @foreach($pendientes as $probeta)
-                        <tr data-id="{{ $probeta->id }}">
+                        @php $locked = $probeta->detalles->isNotEmpty(); @endphp
+                        <tr data-id="{{ $probeta->id }}" @class(['row-locked' => $locked])>
                             <td class="cell-obra">{{ $probeta->remision->obra->nombre ?? '—' }}</td>
-                            <td class="cell-nombre">{{ $probeta->nombre }}</td>
+                            <td class="cell-nombre">
+                                {{ $probeta->nombre }}
+                                @if($locked)
+                                    <span class="badge-informe">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                                        En informe
+                                    </span>
+                                @endif
+                            </td>
                             <td>
                                 <div class="cell-group">
-                                    <input type="text" class="f-text" data-field="defecto" placeholder="Sin defecto" value="{{ $probeta->defecto ?? '' }}">
+                                    <input type="text" class="f-text" data-field="defecto" placeholder="Sin defecto" value="{{ $probeta->defecto ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="carga_rotura" placeholder="kN" value="{{ $probeta->carga_rotura ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="carga_rotura" placeholder="kN" value="{{ $probeta->carga_rotura ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <select class="f-select" data-field="tipo_rotura">
+                                    <select class="f-select" data-field="tipo_rotura" {{ $locked ? 'disabled' : '' }}>
                                         <option value="">—</option>
                                         @for($t = 1; $t <= 6; $t++)
                                             <option value="{{ $t }}" @selected($probeta->tipo_rotura == $t)>{{ $t }}</option>
@@ -321,43 +347,43 @@
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_superior_1" placeholder="mm" value="{{ $probeta->diametro_superior_1 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_superior_1" placeholder="mm" value="{{ $probeta->diametro_superior_1 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_superior_2" placeholder="mm" value="{{ $probeta->diametro_superior_2 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_superior_2" placeholder="mm" value="{{ $probeta->diametro_superior_2 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_inferior_1" placeholder="mm" value="{{ $probeta->diametro_inferior_1 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_inferior_1" placeholder="mm" value="{{ $probeta->diametro_inferior_1 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_inferior_2" placeholder="mm" value="{{ $probeta->diametro_inferior_2 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_inferior_2" placeholder="mm" value="{{ $probeta->diametro_inferior_2 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="altura_1" placeholder="mm" value="{{ $probeta->altura_1 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="altura_1" placeholder="mm" value="{{ $probeta->altura_1 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="altura_2" placeholder="mm" value="{{ $probeta->altura_2 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="altura_2" placeholder="mm" value="{{ $probeta->altura_2 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="altura_3" placeholder="mm" value="{{ $probeta->altura_3 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="altura_3" placeholder="mm" value="{{ $probeta->altura_3 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
@@ -394,24 +420,33 @@
                     </thead>
                     <tbody>
                         @foreach($ensayadas as $probeta)
-                        <tr data-id="{{ $probeta->id }}">
+                        @php $locked = $probeta->detalles->isNotEmpty(); @endphp
+                        <tr data-id="{{ $probeta->id }}" @class(['row-locked' => $locked])>
                             <td class="cell-obra">{{ $probeta->remision->obra->nombre ?? '—' }}</td>
-                            <td class="cell-nombre">{{ $probeta->nombre }}</td>
+                            <td class="cell-nombre">
+                                {{ $probeta->nombre }}
+                                @if($locked)
+                                    <span class="badge-informe">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                                        En informe
+                                    </span>
+                                @endif
+                            </td>
                             <td>
                                 <div class="cell-group">
-                                    <input type="text" class="f-text" data-field="defecto" placeholder="Sin defecto" value="{{ $probeta->defecto ?? '' }}">
+                                    <input type="text" class="f-text" data-field="defecto" placeholder="Sin defecto" value="{{ $probeta->defecto ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="carga_rotura" placeholder="kN" value="{{ $probeta->carga_rotura ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="carga_rotura" placeholder="kN" value="{{ $probeta->carga_rotura ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <select class="f-select" data-field="tipo_rotura">
+                                    <select class="f-select" data-field="tipo_rotura" {{ $locked ? 'disabled' : '' }}>
                                         <option value="">—</option>
                                         @for($t = 1; $t <= 6; $t++)
                                             <option value="{{ $t }}" @selected($probeta->tipo_rotura == $t)>{{ $t }}</option>
@@ -422,43 +457,43 @@
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_superior_1" placeholder="mm" value="{{ $probeta->diametro_superior_1 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_superior_1" placeholder="mm" value="{{ $probeta->diametro_superior_1 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_superior_2" placeholder="mm" value="{{ $probeta->diametro_superior_2 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_superior_2" placeholder="mm" value="{{ $probeta->diametro_superior_2 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_inferior_1" placeholder="mm" value="{{ $probeta->diametro_inferior_1 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_inferior_1" placeholder="mm" value="{{ $probeta->diametro_inferior_1 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_inferior_2" placeholder="mm" value="{{ $probeta->diametro_inferior_2 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="diametro_inferior_2" placeholder="mm" value="{{ $probeta->diametro_inferior_2 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="altura_1" placeholder="mm" value="{{ $probeta->altura_1 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="altura_1" placeholder="mm" value="{{ $probeta->altura_1 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="altura_2" placeholder="mm" value="{{ $probeta->altura_2 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="altura_2" placeholder="mm" value="{{ $probeta->altura_2 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>
                             <td class="cell-center">
                                 <div class="cell-group">
-                                    <input type="number" step="0.01" min="0" class="f-num" data-field="altura_3" placeholder="mm" value="{{ $probeta->altura_3 ?? '' }}">
+                                    <input type="number" step="0.01" min="0" class="f-num" data-field="altura_3" placeholder="mm" value="{{ $probeta->altura_3 ?? '' }}" {{ $locked ? 'disabled' : '' }}>
                                     <button type="button" class="btn-copy" title="Copiar a todas las filas">{!! $copyIcon !!}</button>
                                 </div>
                             </td>

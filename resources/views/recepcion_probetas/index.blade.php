@@ -225,6 +225,15 @@
         .btn-card-activar { border-color: #bbf7d0; color: #15803d; }
         .btn-card-activar:hover { background: #f0fdf4; border-color: #86efac; }
 
+        /* ── Badge bloqueada (en informe) ── */
+        .badge-bloqueada {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px;
+            background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .badge-bloqueada svg { width: 10px; height: 10px; flex-shrink: 0; }
+
         /* ── Badge anulada ── */
         .badge-anulada {
             display: inline-flex; align-items: center; gap: 4px;
@@ -417,7 +426,8 @@
             $nombreCreador = ($creador && $creador->persona && ($creador->persona->nombre || $creador->persona->apellido))
                 ? trim($creador->persona->nombre . ' ' . $creador->persona->apellido)
                 : ($creador->nick ?? '—');
-            $esAnulada = $remision->estado === 2;
+            $esAnulada  = $remision->estado === 2;
+            $bloqueada  = $remision->probetas->some(fn($p) => $p->detalles->isNotEmpty());
         @endphp
         <div
             class="remision-card {{ $esAnulada ? 'anulada' : '' }}"
@@ -449,6 +459,11 @@
             <div class="card-foot">
                 @if($esAnulada)
                     <span class="badge-anulada">Anulada</span>
+                @elseif($bloqueada)
+                    <span class="badge-bloqueada">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                        En informe
+                    </span>
                 @else
                     <span class="card-probetas">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -465,14 +480,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                     </a>
-                    @if(!$esAnulada && $puedeEditar)
+                    @if(!$esAnulada && !$bloqueada && $puedeEditar)
                     <a href="{{ route('remisiones.edit', [$obra, $remision]) }}" class="btn-card btn-card-editar" title="Editar remisión">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/>
                         </svg>
                     </a>
                     @endif
-                    @if(!$esAnulada && $puedeEliminar)
+                    @if(!$esAnulada && !$bloqueada && $puedeEliminar)
                     <button
                         class="btn-card btn-card-anular"
                         title="Anular remisión"

@@ -223,7 +223,7 @@
                 </tr>
                 <tr>
                     <td class="dato-lbl">Contacto</td>
-                    <td class="dato-val">{{ $remision->entregado_por ?? '—' }}</td>
+                    <td class="dato-val">{{ $obra->residente ?? '—' }}</td>
                 </tr>
                 <tr>
                     <td class="dato-lbl">Obra</td>
@@ -264,19 +264,19 @@
     <thead>
         <tr>
             <th>#</th>
-            <th>Nombre</th>
+            <th>Probeta Nº</th>
             <th>Elemento</th>
             <th>F. Moldeo</th>
             <th>Edad<br>(días)</th>
             <th>Carga rotura<br>(kN)</th>
-            <th>Sección<br>(cm²)</th>
-            <th>Altura<br>(cm)</th>
-            <th>Diámetro<br>(cm)</th>
-            <th>Tensión<br>rotura</th>
+            <th>Sección<br>(mm²)</th>
+            <th>Altura<br>(mm)</th>
+            <th>Diámetro<br>(mm)</th>
+            <th>Tensión<br>rotura (MPa)</th>
             <th>H/D</th>
             <th>C(H/D)</th>
-            <th>Tensión<br>corregida</th>
-            <th>Tensión<br>promedio</th>
+            <th>Tensión<br>corregida (MPa)</th>
+            <th>Tensión<br>promedio (MPa)</th>
             <th>Tipo<br>rotura</th>
             <th>Defecto</th>
         </tr>
@@ -330,7 +330,7 @@
             {{-- Número de informe --}}
             <td class="foot-ref">
                 <div class="foot-ref-lbl">Referencia</div>
-                <div class="foot-ref-val">Ref.: Inf. {{ str_pad($nroInforme, 2, '0', STR_PAD_LEFT) }}</div>
+                <div class="foot-ref-val">Ref.: {{ $obra->clave }}-{{ str_pad($nroInforme, 3, '0', STR_PAD_LEFT) }}</div>
             </td>
 
             {{-- Firma --}}
@@ -347,7 +347,7 @@
                     <div class="contacto-ciudad">Fernando de la Mora &mdash; Paraguay</div>
                     <hr class="contacto-sep">
                     <div class="contacto-mail">&#9993;&nbsp; consulta@lemco.com.py</div>
-                    <div class="contacto-tel">&#9990;&nbsp; (595 21) 021 456 &nbsp;|&nbsp; (0985) 727 895</div>
+                    <div class="contacto-tel">&#9990;&nbsp; (595 21) 021 456 &nbsp;|&nbsp; +595 986 161 059</div>
                 </div>
             </td>
         </tr>

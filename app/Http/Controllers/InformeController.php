@@ -222,8 +222,9 @@ class InformeController extends Controller
         $pdf = Pdf::loadView('informes.pdf', compact('obra', 'informe', 'logo', 'tipo', 'firmash', 'nroInforme'))
             ->setPaper('a4', 'landscape');
 
-        $dia    = $fechaEnsayo?->day;
-        $mes    = $fechaEnsayo?->locale('es')->monthName;
+        $fechaMoldeo = $primeraProbeta?->fecha_moldeo;
+        $dia    = $fechaMoldeo?->day;
+        $mes    = $fechaMoldeo?->locale('es')->monthName;
         $nombre = "Obra {$obra->nombre} {$dia} de {$mes} {$diasEnsayo} dias.pdf";
 
         return $pdf->download($nombre);

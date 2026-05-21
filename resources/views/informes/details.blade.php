@@ -230,7 +230,7 @@
             </div>
             <div class="info-field">
                 <label>Contacto</label>
-                <span>{{ $remision->entregado_por ?? '—' }}</span>
+                <span>{{ $obra->residente ?? '—' }}</span>
             </div>
             <div class="info-field">
                 <label>Obra</label>

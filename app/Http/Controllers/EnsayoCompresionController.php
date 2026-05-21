@@ -25,7 +25,7 @@ class EnsayoCompresionController extends Controller
         $probetas = Probeta::whereRaw(
             'DATE_ADD(fecha_moldeo, INTERVAL edad_ensayo DAY) BETWEEN ? AND ?',
             [$primerDia->format('Y-m-d'), $ultimoDia->format('Y-m-d')]
-        )->get();
+        )->whereHas('remision', fn($q) => $q->where('estado', 1))->get();
 
         $datosPorDia = [];
         foreach ($probetas as $probeta) {
@@ -77,11 +77,12 @@ class EnsayoCompresionController extends Controller
     {
         $fecha = Carbon::parse($fecha)->format('Y-m-d');
 
-        $probetas = Probeta::with('remision.obra')
+        $probetas = Probeta::with('remision.obra', 'detalles')
             ->whereRaw(
                 'DATE_ADD(fecha_moldeo, INTERVAL edad_ensayo DAY) = ?',
                 [$fecha]
             )
+            ->whereHas('remision', fn($q) => $q->where('estado', 1))
             ->get();
 
         $pendientes = $probetas->filter(fn($p) => !$this->estaEnsayada($p))->values();
@@ -179,6 +180,10 @@ class EnsayoCompresionController extends Controller
 
     public function store(Request $request, Probeta $probeta): JsonResponse
     {
+        if ($probeta->detalles()->exists()) {
+            return response()->json(['message' => 'La probeta ya pertenece a un informe y no se puede editar.'], 403);
+        }
+
         $validated = $request->validate([
             'defecto'             => ['nullable', 'string', 'max:255'],
             'carga_rotura'        => ['nullable', 'numeric', 'min:0'],

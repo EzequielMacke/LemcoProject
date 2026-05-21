@@ -162,8 +162,16 @@ class RemisionController extends Controller
             ->with('success', "Remisión «{$remision->nro}» creada con éxito.");
     }
 
+    private function tieneProvetasEnInforme(Remision $remision): bool
+    {
+        return $remision->probetas()->whereHas('detalles')->exists();
+    }
+
     public function edit(Obra $obra, Remision $remision): View
     {
+        if ($this->tieneProvetasEnInforme($remision)) {
+            abort(403, 'La remisión no se puede editar porque tiene probetas incluidas en un informe.');
+        }
         $grupos = $remision->probetas()
             ->orderBy('nombre')
             ->get()
@@ -184,6 +192,11 @@ class RemisionController extends Controller
 
     public function update(Request $request, Obra $obra, Remision $remision): RedirectResponse
     {
+        if ($this->tieneProvetasEnInforme($remision)) {
+            return redirect()->route('remisiones.index', $obra)
+                ->with('error', 'La remisión no se puede editar porque tiene probetas incluidas en un informe.');
+        }
+
         $data = $request->validate([
             'nro'                               => 'required|string|max:7',
             'contratista'                       => 'required|string|max:255',
@@ -237,7 +250,7 @@ class RemisionController extends Controller
     public function index(Obra $obra): View
     {
         $remisiones = Remision::where('obra_id', $obra->id)
-            ->with(['recibidoPor.persona'])
+            ->with(['recibidoPor.persona', 'probetas.detalles'])
             ->withCount('probetas')
             ->orderByDesc('id')
             ->get();
@@ -257,6 +270,10 @@ class RemisionController extends Controller
 
     public function anular(Obra $obra, Remision $remision): RedirectResponse
     {
+        if ($this->tieneProvetasEnInforme($remision)) {
+            return back()->with('error', 'La remisión no se puede anular porque tiene probetas incluidas en un informe.');
+        }
+
         $remision->update(['estado' => 2]);
 
         return back()->with('success', "La remisión «{$remision->nro}» fue anulada.");

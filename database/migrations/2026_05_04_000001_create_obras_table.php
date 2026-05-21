@@ -11,7 +11,9 @@ return new class extends Migration
         Schema::create('obras', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
+            $table->string('clave', 3)->unique();
             $table->integer('estado');
+            $table->string('residente')->nullable();
             $table->foreignId('usuario_id')->constrained('usuarios');
             $table->timestamps();
         });

@@ -559,6 +559,21 @@
                         <span class="field-error">{{ $message }}</span>
                     @enderror
                 </div>
+                <div class="field" style="margin-top:14px">
+                    <label for="inp-residente">Residente</label>
+                    <input
+                        type="text"
+                        id="inp-residente"
+                        name="residente"
+                        value="{{ old('residente', $obra->residente) }}"
+                        placeholder="Nombre del residente (opcional)"
+                        autocomplete="off"
+                        class="{{ $errors->has('residente') ? 'is-invalid' : '' }}"
+                    >
+                    @error('residente')
+                        <span class="field-error">{{ $message }}</span>
+                    @enderror
+                </div>
             </div>
             <div class="modal-foot">
                 <button type="button" class="btn-cancel" onclick="cerrarModal('modal-editar')">Cancelar</button>
