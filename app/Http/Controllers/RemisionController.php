@@ -187,7 +187,7 @@ class RemisionController extends Controller
 
     private function remisionBloqueada(Remision $remision): bool
     {
-        return $this->remisionBloqueada($remision)
+        return $this->tieneProvetasEnInforme($remision)
             || $this->tieneProvetasEnsayadas($remision);
     }
 
