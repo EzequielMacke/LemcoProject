@@ -48,7 +48,7 @@ class AdminSeeder extends Seeder
         // Usuario admin
         Usuario::create([
             'nick'       => 'admin',
-            'contrasena' => 'admin',
+            'contrasena' => '#Paraguari1_',
             'estado'     => 1,
             'envio'      => 0,
             'area_id'    => $area->id,
