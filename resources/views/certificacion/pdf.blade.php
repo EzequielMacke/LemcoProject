@@ -94,7 +94,6 @@
         .dest-label {
             font-size: 9.5px;
             font-weight: bold;
-            text-transform: uppercase;
             letter-spacing: 0.3px;
             margin-bottom: 3px;
         }
@@ -130,7 +129,6 @@
             color: #111;
             font-size: 7.5px;
             font-weight: bold;
-            text-transform: uppercase;
             letter-spacing: 0.4px;
             padding: 5px 8px;
             text-align: center;
@@ -184,7 +182,6 @@
         .detalle-titulo {
             font-size: 11px;
             font-weight: bold;
-            text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 14px;
             padding-bottom: 6px;
@@ -201,7 +198,6 @@
             color: #111;
             font-size: 7px;
             font-weight: bold;
-            text-transform: uppercase;
             letter-spacing: 0.4px;
             padding: 5px 6px;
             text-align: center;
@@ -394,7 +390,7 @@ $cantDetalles  = $certificado->detalles->count();
                 <th style="width:22%">Nombre de probeta</th>
                 <th style="width:13%">Fecha de recepción</th>
                 <th style="width:20%">Elemento</th>
-                <th style="width:8%">f'ck (MPa)</th>
+                <th style="width:8%">Fck (MPa)</th>
                 <th style="width:13%">Fecha de moldeo</th>
             </tr>
         </thead>

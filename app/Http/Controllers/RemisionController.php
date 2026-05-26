@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\RemisionMail;
+use App\Models\CertificadoDetalle;
 use App\Models\Contacto;
 use App\Models\Obra;
 use App\Models\Probeta;
@@ -162,6 +163,11 @@ class RemisionController extends Controller
             ->with('success', "Remisión «{$remision->nro}» creada con éxito.");
     }
 
+    private function remisionCertificada(Remision $remision): bool
+    {
+        return CertificadoDetalle::where('remision_id', $remision->id)->exists();
+    }
+
     private function tieneProvetasEnInforme(Remision $remision): bool
     {
         return $remision->probetas()->whereHas('detalles')->exists();
@@ -193,6 +199,9 @@ class RemisionController extends Controller
 
     public function edit(Obra $obra, Remision $remision): View
     {
+        if ($this->remisionCertificada($remision)) {
+            abort(403, 'La remisión no se puede editar porque está incluida en un certificado.');
+        }
         if ($this->remisionBloqueada($remision)) {
             abort(403, 'La remisión no se puede editar porque tiene probetas incluidas en un informe.');
         }
@@ -216,6 +225,10 @@ class RemisionController extends Controller
 
     public function update(Request $request, Obra $obra, Remision $remision): RedirectResponse
     {
+        if ($this->remisionCertificada($remision)) {
+            return redirect()->route('remisiones.index', $obra)
+                ->with('error', 'La remisión no se puede editar porque está incluida en un certificado.');
+        }
         if ($this->remisionBloqueada($remision)) {
             return redirect()->route('remisiones.index', $obra)
                 ->with('error', 'La remisión no se puede editar porque tiene probetas incluidas en un informe.');
@@ -287,13 +300,22 @@ class RemisionController extends Controller
         $activas  = $remisiones->where('estado', 1)->count();
         $anuladas = $remisiones->where('estado', 2)->count();
 
+        $remisionesCertificadasIds = CertificadoDetalle::whereNotNull('remision_id')
+            ->whereIn('remision_id', $remisiones->pluck('id'))
+            ->pluck('remision_id')
+            ->unique();
+
         return view('recepcion_probetas.index', compact(
-            'obra', 'remisiones', 'puedeAgregar', 'puedeEditar', 'puedeEliminar', 'activas', 'anuladas'
+            'obra', 'remisiones', 'puedeAgregar', 'puedeEditar', 'puedeEliminar',
+            'activas', 'anuladas', 'remisionesCertificadasIds'
         ));
     }
 
     public function anular(Obra $obra, Remision $remision): RedirectResponse
     {
+        if ($this->remisionCertificada($remision)) {
+            return back()->with('error', 'La remisión no se puede anular porque está incluida en un certificado.');
+        }
         if ($this->remisionBloqueada($remision)) {
             return back()->with('error', 'La remisión no se puede anular porque tiene probetas incluidas en un informe.');
         }

@@ -242,6 +242,15 @@
             text-transform: uppercase; letter-spacing: 0.4px;
         }
 
+        /* ── Badge certificado ── */
+        .badge-certificado {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px;
+            background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe;
+            letter-spacing: 0.4px;
+        }
+        .badge-certificado svg { width: 10px; height: 10px; flex-shrink: 0; }
+
         /* ── Empty state ── */
         .empty-state {
             grid-column: 1 / -1;
@@ -426,8 +435,9 @@
             $nombreCreador = ($creador && $creador->persona && ($creador->persona->nombre || $creador->persona->apellido))
                 ? trim($creador->persona->nombre . ' ' . $creador->persona->apellido)
                 : ($creador->nick ?? '—');
-            $esAnulada  = $remision->estado === 2;
-            $bloqueada  = $remision->probetas->some(fn($p) =>
+            $esAnulada      = $remision->estado === 2;
+            $esCertificada  = $remisionesCertificadasIds->contains($remision->id);
+            $bloqueada      = $remision->probetas->some(fn($p) =>
                 $p->detalles->isNotEmpty() || (
                     $p->fecha_ensayo !== null && $p->ensayo_por !== null &&
                     $p->defecto !== null && $p->carga_rotura !== null &&
@@ -468,6 +478,11 @@
             <div class="card-foot">
                 @if($esAnulada)
                     <span class="badge-anulada">Anulada</span>
+                @elseif($esCertificada)
+                    <span class="badge-certificado">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Certificado
+                    </span>
                 @elseif($bloqueada)
                     <span class="badge-bloqueada">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
@@ -489,14 +504,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                     </a>
-                    @if(!$esAnulada && !$bloqueada && $puedeEditar)
+                    @if(!$esAnulada && !$bloqueada && !$esCertificada && $puedeEditar)
                     <a href="{{ route('remisiones.edit', [$obra, $remision]) }}" class="btn-card btn-card-editar" title="Editar remisión">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/>
                         </svg>
                     </a>
                     @endif
-                    @if(!$esAnulada && !$bloqueada && $puedeEliminar)
+                    @if(!$esAnulada && !$bloqueada && !$esCertificada && $puedeEliminar)
                     <button
                         class="btn-card btn-card-anular"
                         title="Anular remisión"
