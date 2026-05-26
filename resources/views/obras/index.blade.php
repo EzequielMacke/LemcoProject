@@ -304,8 +304,27 @@
             border-color: #ea580c; background: #fff;
             box-shadow: 0 0 0 3px rgba(234,88,12,0.1);
         }
-        .field input.is-invalid { border-color: #f87171; }
+        .field input.is-invalid,
+        .field select.is-invalid { border-color: #f87171; }
         .field-error { font-size: 12px; color: #be123c; }
+
+        .field select {
+            width: 100%; border: 1.5px solid #e9ecef; border-radius: 10px;
+            padding: 10px 13px; font-size: 13.5px; color: #111827;
+            background: #fafafa; outline: none; font-family: 'Inter', sans-serif;
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 36px;
+            cursor: pointer;
+            transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+        }
+        .field select:focus {
+            border-color: #ea580c; background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(234,88,12,0.1);
+        }
 
         .modal-foot {
             padding: 16px 22px;
@@ -555,6 +574,22 @@
                         class="{{ $errors->has('nombre') ? 'is-invalid' : '' }}"
                     >
                     @error('nombre')
+                        <span class="field-error">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="field" style="margin-top:14px">
+                    <label for="inp-tipo-cert">Tipo de certificación</label>
+                    <select
+                        id="inp-tipo-cert"
+                        name="tipo_certificacion"
+                        required
+                        class="{{ $errors->has('tipo_certificacion') ? 'is-invalid' : '' }}"
+                    >
+                        <option value="" {{ old('tipo_certificacion') === null ? 'selected' : '' }}>— Sin especificar —</option>
+                        <option value="1" {{ old('tipo_certificacion') == 1 ? 'selected' : '' }}>Por remisión</option>
+                        <option value="2" {{ old('tipo_certificacion') == 2 ? 'selected' : '' }}>Por informe</option>
+                    </select>
+                    @error('tipo_certificacion')
                         <span class="field-error">{{ $message }}</span>
                     @enderror
                 </div>

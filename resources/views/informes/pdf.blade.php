@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Informe de Ensayo #{{ $informe->id }}</title>
+    <title>Informe de Ensayo #{{ $nroInforme }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 

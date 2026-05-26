@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\CertificacionController;
 use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\EnsayoCompresionController;
 use App\Http\Controllers\InformeController;
@@ -130,6 +131,20 @@ Route::middleware(Autenticado::class)->group(function () {
     });
     Route::middleware('permiso:INF,eliminar')->group(function () {
         Route::delete('/obras/{obra}/informes/{informe}',                      [InformeController::class, 'destroy'])->name('informes.destroy');
+    });
+
+    Route::middleware('permiso:CER')->group(function () {
+        Route::get('/obras/{obra}/certificacion',                        [CertificacionController::class, 'index'])->name('certificacion.index');
+        Route::get('/obras/{obra}/certificacion/crear',                  [CertificacionController::class, 'create'])->name('certificacion.create');
+        Route::post('/obras/{obra}/certificacion',                       [CertificacionController::class, 'store'])->name('certificacion.store');
+        Route::get('/obras/{obra}/certificacion/{certificado}',          [CertificacionController::class, 'show'])->name('certificacion.show');
+        Route::get('/obras/{obra}/certificacion/{certificado}/editar',       [CertificacionController::class, 'edit'])->name('certificacion.edit');
+        Route::put('/obras/{obra}/certificacion/{certificado}',            [CertificacionController::class, 'update'])->name('certificacion.update');
+        Route::get('/obras/{obra}/certificacion/{certificado}/pdf',             [CertificacionController::class, 'pdf'])->name('certificacion.pdf');
+        Route::patch('/obras/{obra}/certificacion/{certificado}/verificar',    [CertificacionController::class, 'verificar'])->name('certificacion.verificar');
+        Route::patch('/obras/{obra}/certificacion/{certificado}/desverificar', [CertificacionController::class, 'desverificar'])->name('certificacion.desverificar');
+        Route::post('/obras/{obra}/certificacion/{certificado}/enviar',      [CertificacionController::class, 'enviar'])->name('certificacion.enviar');
+        Route::delete('/obras/{obra}/certificacion/{certificado}',         [CertificacionController::class, 'destroy'])->name('certificacion.destroy');
     });
 
     Route::middleware('permiso:RPB')->group(function () {

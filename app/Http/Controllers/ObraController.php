@@ -87,22 +87,26 @@ class ObraController extends Controller
     {
         $request->validate(
             [
-                'nombre'    => 'required|string|max:150',
-                'residente' => 'nullable|string|max:150',
+                'nombre'             => 'required|string|max:150',
+                'tipo_certificacion' => 'required|integer|in:1,2',
+                'residente'          => 'nullable|string|max:150',
             ],
             [
-                'nombre.required' => 'El nombre es obligatorio.',
-                'nombre.max'      => 'El nombre no puede superar los 150 caracteres.',
-                'residente.max'   => 'El residente no puede superar los 150 caracteres.',
+                'nombre.required'             => 'El nombre es obligatorio.',
+                'nombre.max'                  => 'El nombre no puede superar los 150 caracteres.',
+                'tipo_certificacion.required' => 'El tipo de certificación es obligatorio.',
+                'tipo_certificacion.in'       => 'El tipo de certificación seleccionado no es válido.',
+                'residente.max'               => 'El residente no puede superar los 150 caracteres.',
             ]
         );
 
         Obra::create([
-            'nombre'     => $request->nombre,
-            'clave'      => $this->siguienteClave(),
-            'residente'  => $request->residente ?: null,
-            'estado'     => 1,
-            'usuario_id' => session('usuario.id'),
+            'nombre'             => $request->nombre,
+            'clave'              => $this->siguienteClave(),
+            'tipo_certificacion' => $request->tipo_certificacion,
+            'residente'          => $request->residente ?: null,
+            'estado'             => 1,
+            'usuario_id'         => session('usuario.id'),
         ]);
 
         return back()->with('success', 'Obra creada correctamente.');

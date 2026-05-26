@@ -6,13 +6,14 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['nombre', 'clave', 'estado', 'residente', 'usuario_id'])]
+#[Fillable(['nombre', 'clave', 'estado', 'tipo_certificacion', 'residente', 'usuario_id'])]
 class Obra extends Model
 {
     protected function casts(): array
     {
         return [
-            'estado' => 'integer',
+            'estado'             => 'integer',
+            'tipo_certificacion' => 'integer',
         ];
     }
 

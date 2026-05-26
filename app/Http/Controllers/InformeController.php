@@ -118,7 +118,11 @@ class InformeController extends Controller
         $usuarios  = Usuario::where('envio', 1)->with('persona')->get();
         $contactos = Contacto::where('obra_id', $obra->id)->where('estado', 1)->get();
 
-        return view('informes.details', compact('obra', 'informe', 'usuarios', 'contactos'));
+        $nroInforme = ProbetaInforme::where('obra_id', $obra->id)
+            ->where('id', '<=', $informe->id)
+            ->count();
+
+        return view('informes.details', compact('obra', 'informe', 'usuarios', 'contactos', 'nroInforme'));
     }
 
     public function enviar(Request $request, Obra $obra, ProbetaInforme $informe): RedirectResponse

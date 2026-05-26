@@ -28,6 +28,7 @@ class AdminSeeder extends Seeder
             ['descripcion' => 'Recepcion de probetas',      'abreviacion' => 'RPB'],
             ['descripcion' => 'Ensayos de Compresion',      'abreviacion' => 'ENS'],
             ['descripcion' => 'Informe de probetas',        'abreviacion' => 'INF'],
+            ['descripcion' => 'Certificación',              'abreviacion' => 'CER'],
         ];
 
         foreach ($modulos as $data) {

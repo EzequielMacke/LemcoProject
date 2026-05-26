@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('clave', 3)->unique();
             $table->integer('estado');
+            $table->integer('tipo_certificacion')->nullable();
             $table->string('residente')->nullable();
             $table->foreignId('usuario_id')->constrained('usuarios');
             $table->timestamps();
