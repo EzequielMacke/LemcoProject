@@ -37,9 +37,10 @@
         /* Badge estado */
         .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 99px; }
         .badge svg { width: 11px; height: 11px; }
-        .badge-pendiente  { background: #fffbeb; color: #d97706; border: 1.5px solid #fde68a; }
-        .badge-enviado    { background: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; }
-        .badge-verificado { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+        .badge-pendiente    { background: #fffbeb; color: #d97706; border: 1.5px solid #fde68a; }
+        .badge-enviado      { background: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; }
+        .badge-verificado   { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+        .badge-certificado  { background: #f5f3ff; color: #6d28d9; border: 1.5px solid #ddd6fe; }
 
         /* Botones acción */
         .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -164,7 +165,7 @@
         </div>
         <div class="header-actions">
             {{-- Badges: izquierda --}}
-            @if(!$informe->verificado && !$informe->enviado)
+            @if(!$informe->verificado && !$informe->enviado && !$esCertificado)
                 <span class="badge badge-pendiente">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Pendiente
@@ -182,9 +183,16 @@
                     Enviado
                 </span>
             @endif
+            @if($esCertificado)
+                <span class="badge badge-certificado">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Certificado
+                </span>
+            @endif
 
             {{-- Botones: derecha --}}
             @if($informe->verificado)
+                @if(!$esCertificado)
                 @permiso('INF', 'editar')
                 <form method="POST" action="{{ route('informes.pendiente', [$obra, $informe]) }}">
                     @csrf @method('PATCH')
@@ -194,6 +202,7 @@
                     </button>
                 </form>
                 @endpermiso
+                @endif
                 <button type="button" class="btn-email" onclick="abrirModal('modal-enviar')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
                     Enviar por correo
@@ -203,6 +212,7 @@
                     Descargar PDF
                 </a>
             @else
+                @if(!$esCertificado)
                 @permiso('INF', 'editar')
                 <form method="POST" action="{{ route('informes.verificar', [$obra, $informe]) }}">
                     @csrf @method('PATCH')
@@ -212,6 +222,7 @@
                     </button>
                 </form>
                 @endpermiso
+                @endif
             @endif
         </div>
     </div>

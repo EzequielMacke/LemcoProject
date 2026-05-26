@@ -9,6 +9,7 @@ use App\Models\Usuario;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
+use App\Models\CertificadoDetalle;
 use App\Models\Obra;
 use App\Models\Probeta;
 use App\Models\ProbetaInforme;
@@ -59,7 +60,12 @@ class InformeController extends Controller
             ])
             ->values();
 
-        return view('informes.index', compact('obra', 'pendientes', 'informes'));
+        $informesCertificadosIds = CertificadoDetalle::whereNotNull('informe_id')
+            ->whereIn('informe_id', $informes->pluck('id'))
+            ->pluck('informe_id')
+            ->unique();
+
+        return view('informes.index', compact('obra', 'pendientes', 'informes', 'informesCertificadosIds'));
     }
 
     public function crear(Obra $obra, Remision $remision, Request $request): View
@@ -122,7 +128,9 @@ class InformeController extends Controller
             ->where('id', '<=', $informe->id)
             ->count();
 
-        return view('informes.details', compact('obra', 'informe', 'usuarios', 'contactos', 'nroInforme'));
+        $esCertificado = CertificadoDetalle::where('informe_id', $informe->id)->exists();
+
+        return view('informes.details', compact('obra', 'informe', 'usuarios', 'contactos', 'nroInforme', 'esCertificado'));
     }
 
     public function enviar(Request $request, Obra $obra, ProbetaInforme $informe): RedirectResponse

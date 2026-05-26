@@ -82,9 +82,10 @@
 
         .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
         .badge svg { width: 10px; height: 10px; }
-        .badge-pendiente  { background: #fffbeb; color: #d97706; border: 1.5px solid #fde68a; }
-        .badge-enviado    { background: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; }
-        .badge-verificado { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+        .badge-pendiente    { background: #fffbeb; color: #d97706; border: 1.5px solid #fde68a; }
+        .badge-enviado      { background: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; }
+        .badge-verificado   { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+        .badge-certificado  { background: #f5f3ff; color: #6d28d9; border: 1.5px solid #ddd6fe; }
 
         .card-arrow { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #f59e0b; }
         .card-arrow svg { width: 12px; height: 12px; }
@@ -240,8 +241,9 @@
                 <div class="card-inner">
                     <div class="card-nro">Rem. {{ $remision->nro ?? '—' }}</div>
                     <div class="card-fecha">Moldeo: {{ $fechaMoldeoInf?->format('d/m/Y') ?? '—' }}</div>
+                    @php $esCert = $informesCertificadosIds->contains($informe->id); @endphp
                     <div style="margin-bottom:10px; display:flex; gap:5px; flex-wrap:wrap;">
-                        @if(!$informe->verificado && !$informe->enviado)
+                        @if(!$informe->verificado && !$informe->enviado && !$esCert)
                             <span class="badge badge-pendiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Pendiente</span>
                         @endif
                         @if($informe->verificado)
@@ -249,6 +251,9 @@
                         @endif
                         @if($informe->enviado)
                             <span class="badge badge-enviado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>Enviado</span>
+                        @endif
+                        @if($esCert)
+                            <span class="badge badge-certificado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Certificado</span>
                         @endif
                     </div>
                     <div class="card-rows">
@@ -271,12 +276,14 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082M5 14.5h14"/></svg>
                         {{ $informe->detalles_count }} prob.
                     </span>
+                    @if(!$esCert)
                     @permiso('INF', 'eliminar')
                     <button class="btn-card btn-card-eliminar" title="Eliminar informe"
                         onclick="event.stopPropagation(); abrirEliminar({{ $informe->id }}, @js($remision->nro ?? '—'))">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
                     </button>
                     @endpermiso
+                    @endif
                 </div>
             </div>
             @endforeach
