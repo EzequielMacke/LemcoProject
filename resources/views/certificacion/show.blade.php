@@ -287,6 +287,7 @@
         <div class="header-actions">
             @if($certificado->verificado)
                 {{-- Quitar verificación --}}
+                @permiso('CER', 'editar')
                 <form method="POST" action="{{ route('certificacion.desverificar', [$obra, $certificado]) }}">
                     @csrf @method('PATCH')
                     <button type="submit" class="btn-pendiente">
@@ -296,6 +297,7 @@
                         Marcar como pendiente
                     </button>
                 </form>
+                @endpermiso
                 {{-- Enviar por correo --}}
                 <button type="button" class="btn-email" onclick="abrirModal('modal-enviar')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -312,6 +314,7 @@
                 </a>
             @else
                 {{-- Editar --}}
+                @permiso('CER', 'editar')
                 <a href="{{ route('certificacion.edit', [$obra, $certificado]) }}" class="btn-secondary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/>
@@ -328,6 +331,7 @@
                         Verificar
                     </button>
                 </form>
+                @endpermiso
             @endif
         </div>
     </div>
