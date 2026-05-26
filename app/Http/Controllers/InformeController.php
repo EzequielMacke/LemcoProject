@@ -164,9 +164,10 @@ class InformeController extends Controller
             ? $primeraProbeta->fecha_moldeo->diffInDays($fechaEnsayo)
             : null;
 
-        $dia      = $fechaEnsayo?->day;
-        $mes      = $fechaEnsayo?->locale('es')->monthName;
-        $filename = "Obra {$obra->nombre} {$dia} de {$mes} {$diasEnsayo} dias.pdf";
+        $fechaMoldeo = $primeraProbeta?->fecha_moldeo;
+        $dia         = $fechaMoldeo?->day;
+        $mes         = $fechaMoldeo?->locale('es')->monthName;
+        $filename    = "Obra {$obra->nombre} {$dia} de {$mes} {$diasEnsayo} dias.pdf";
 
         $destinatarios = collect();
 

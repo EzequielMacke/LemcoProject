@@ -238,7 +238,7 @@ class CertificacionController extends Controller
             'nroCertificado', 'totalProbetas', 'totalMonto', 'tipoCert', 'nrosInformes'
         ))->setPaper('a4', 'portrait');
 
-        $filename = "Certificado_{$nroCertificado}_{$obra->clave}.pdf";
+        $filename = "Certificado_{$nroCertificado}_{$obra->nombre}.pdf";
 
         return response($pdf->output(), 200, [
             'Content-Type'        => 'application/pdf',
