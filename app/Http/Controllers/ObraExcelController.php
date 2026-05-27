@@ -85,12 +85,12 @@ class ObraExcelController extends Controller
     private const BG_CERT     = 'FF4c1d95';
 
     private const TIPO_ROTURA = [
-        1 => 'Tipo 1 – Cónica',
-        2 => 'Tipo 2 – Cónica partida',
-        3 => 'Tipo 3 – Cónica cizalla',
-        4 => 'Tipo 4 – Cizalla',
-        5 => 'Tipo 5 – Partida superior',
-        6 => 'Tipo 6 – Similar col.',
+        1 => 'Tipo 1',
+        2 => 'Tipo 2',
+        3 => 'Tipo 3',
+        4 => 'Tipo 4',
+        5 => 'Tipo 5',
+        6 => 'Tipo 6',
     ];
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -275,7 +275,7 @@ class ObraExcelController extends Controller
             self::C_DPROM     => ['D.Prom (mm)',       self::BG_CALC],
             self::C_AREA      => ['Área (mm²)',        self::BG_CALC],
             self::C_HPROM     => ['Alt.Prom (mm)',     self::BG_CALC],
-            self::C_ESBELTEZ   => ['Esbeltez (h/d)',    self::BG_CALC],
+            self::C_ESBELTEZ   => ['(h/d)',    self::BG_CALC],
             self::C_RESIST     => ['Resist. (MPa)',    self::BG_CALC],
             self::C_FACTOR_HD  => ['C(h/d)',           self::BG_CALC],
             self::C_RESIST_COR => ['Resist.Cor. (MPa)',self::BG_CALC],
