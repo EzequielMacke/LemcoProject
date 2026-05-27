@@ -116,6 +116,16 @@
         .btn-success:hover { background: #f0fdf4; border-color: #86efac; }
         .btn-success svg { width: 14px; height: 14px; }
 
+        .btn-excel {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: none; border: 1.5px solid #d1fae5; border-radius: 10px;
+            padding: 9px 14px; font-size: 13px; font-weight: 500;
+            color: #065f46; text-decoration: none; font-family: 'Inter', sans-serif;
+            transition: all 0.15s;
+        }
+        .btn-excel:hover { background: #ecfdf5; border-color: #6ee7b7; color: #064e3b; }
+        .btn-excel svg { width: 15px; height: 15px; flex-shrink: 0; }
+
         /* ── Alertas ── */
         .alert {
             border-radius: 10px; padding: 12px 16px; font-size: 13px;
@@ -292,17 +302,20 @@
             /* Botones solo ícono */
             .btn-secondary,
             .btn-danger,
-            .btn-success {
+            .btn-success,
+            .btn-excel {
                 padding: 7px;
                 border-radius: 9px;
                 gap: 0;
             }
             .btn-secondary span,
             .btn-danger span,
-            .btn-success span { display: none; }
+            .btn-success span,
+            .btn-excel span { display: none; }
             .btn-secondary svg,
             .btn-danger svg,
-            .btn-success svg { width: 16px; height: 16px; }
+            .btn-success svg,
+            .btn-excel svg { width: 16px; height: 16px; }
 
             /* Cards aplastadas en fila */
             .cards-grid {
@@ -432,6 +445,17 @@
                 </button>
             </form>
             @endif
+            @permiso('RPB')
+            <a href="{{ route('obras.excel', $obra) }}"
+               class="btn-excel"
+               title="Descargar planilla Excel con todas las probetas">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                </svg>
+                <span>Excel</span>
+            </a>
+            @endpermiso
         </div>
     </div>
 

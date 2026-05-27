@@ -7,6 +7,7 @@ use App\Http\Controllers\EnsayoCompresionController;
 use App\Http\Controllers\InformeController;
 use App\Http\Controllers\RemisionController;
 use App\Http\Controllers\ObraController;
+use App\Http\Controllers\ObraExcelController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\UsuarioController;
@@ -79,8 +80,9 @@ Route::middleware(Autenticado::class)->group(function () {
     });
 
     Route::middleware('permiso:OBR')->group(function () {
-        Route::get('/obras',        [ObraController::class, 'index'])->name('obras.index');
-        Route::get('/obras/{obra}', [ObraController::class, 'show'])->name('obras.show');
+        Route::get('/obras',                   [ObraController::class,      'index'])->name('obras.index');
+        Route::get('/obras/{obra}',            [ObraController::class,      'show'])->name('obras.show');
+        Route::get('/obras/{obra}/excel',      [ObraExcelController::class, 'exportar'])->name('obras.excel');
     });
     Route::middleware('permiso:OBR,agregar')->group(function () {
         Route::post('/obras', [ObraController::class, 'store'])->name('obras.store');
