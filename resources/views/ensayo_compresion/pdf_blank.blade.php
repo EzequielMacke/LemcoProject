@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Planilla Ensayo Compresión — {{ $obra->nombre }}</title>
+    <title>Planilla Ensayo Compresión</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -111,7 +111,7 @@
         .probetas thead th:last-child { border-right: none; }
 
         .probetas tbody td {
-            padding: 4px 4px;
+            padding: 9px 4px;
             font-size: 8.5px;
             text-align: center;
             border-right: 1px solid #ccc;
@@ -124,44 +124,9 @@
         .td-nombre { font-weight: bold; text-align: left !important; }
         .td-left   { text-align: left !important; }
 
-        /* ════ OUTLIER ════ */
-        .outlier {
-            color: #cc0000 !important;
-            font-weight: bold;
-        }
-        .probetas tbody tr:nth-child(even) td.outlier { background: #fff0f0 !important; }
-        .probetas tbody tr:nth-child(odd)  td.outlier { background: #fff5f5 !important; }
-
     </style>
 </head>
 <body>
-
-@php
-    /* ── Estadísticas para detección de outliers ── */
-    $numericFields = [
-        'carga_rotura',
-        'diametro_superior_1', 'diametro_superior_2',
-        'diametro_inferior_1', 'diametro_inferior_2',
-        'altura_1', 'altura_2', 'altura_3',
-    ];
-
-    $stats = [];
-    foreach ($numericFields as $field) {
-        $vals = $probetas->pluck($field)->filter(fn($v) => $v !== null)->map(fn($v) => (float)$v)->values();
-        if ($vals->count() > 1) {
-            $mean     = $vals->avg();
-            $stdDev   = sqrt($vals->map(fn($v) => ($v - $mean) ** 2)->avg());
-            $stats[$field] = ['mean' => $mean, 'stdDev' => $stdDev];
-        }
-    }
-
-    $isOutlier = function($val, $field) use ($stats): bool {
-        if ($val === null || !isset($stats[$field])) return false;
-        if ($stats[$field]['stdDev'] < 0.0001) return false;
-        return abs((float)$val - $stats[$field]['mean']) > 1.5 * $stats[$field]['stdDev'];
-    };
-
-@endphp
 
 {{-- ═══ CABECERA ═══ --}}
 <table class="cabecera">
@@ -185,11 +150,11 @@
 <table class="datos">
     <tr>
         <td style="width:58%;">
-            <div class="campo-valor">{{ $obra->nombre }}</div>
+            <div class="campo-valor">&nbsp;</div>
             <div class="campo-label">Obra</div>
         </td>
         <td style="width:42%;">
-            <div class="campo-valor">ASTM C39/C39-2026</div>
+            <div class="campo-valor">&nbsp;</div>
             <div class="campo-label">Norma de referencia</div>
         </td>
     </tr>
@@ -232,38 +197,24 @@
         </tr>
     </thead>
     <tbody>
-        @forelse($probetas as $probeta)
-        @php
-            $ens = $probeta->ensayadoPor;
-            $nombreEns = $ens
-                ? (($ens->persona && ($ens->persona->nombre || $ens->persona->apellido))
-                    ? trim($ens->persona->nombre . ' ' . $ens->persona->apellido)
-                    : $ens->nick)
-                : '—';
-        @endphp
+        @for ($i = 0; $i < 12; $i++)
         <tr>
-            <td>{{ $probeta->fecha_ensayo?->format('d/m/Y') ?? '—' }}</td>
-            <td>{{ $probeta->fecha_moldeo?->format('d/m/Y') ?? '—' }}</td>
-            <td class="td-nombre">{{ $probeta->nombre }}</td>
-            <td class="td-left">{{ $probeta->defecto ?: '—' }}</td>
-            <td class="{{ $isOutlier($probeta->carga_rotura,        'carga_rotura')        ? 'outlier' : '' }}">{{ $probeta->carga_rotura        ?? '—' }}</td>
-            <td>{{ $probeta->tipo_rotura ?? '—' }}</td>
-            <td class="{{ $isOutlier($probeta->diametro_superior_1, 'diametro_superior_1') ? 'outlier' : '' }}">{{ $probeta->diametro_superior_1 ?? '—' }}</td>
-            <td class="{{ $isOutlier($probeta->diametro_superior_2, 'diametro_superior_2') ? 'outlier' : '' }}">{{ $probeta->diametro_superior_2 ?? '—' }}</td>
-            <td class="{{ $isOutlier($probeta->diametro_inferior_1, 'diametro_inferior_1') ? 'outlier' : '' }}">{{ $probeta->diametro_inferior_1 ?? '—' }}</td>
-            <td class="{{ $isOutlier($probeta->diametro_inferior_2, 'diametro_inferior_2') ? 'outlier' : '' }}">{{ $probeta->diametro_inferior_2 ?? '—' }}</td>
-            <td class="{{ $isOutlier($probeta->altura_1,            'altura_1')            ? 'outlier' : '' }}">{{ $probeta->altura_1            ?? '—' }}</td>
-            <td class="{{ $isOutlier($probeta->altura_2,            'altura_2')            ? 'outlier' : '' }}">{{ $probeta->altura_2            ?? '—' }}</td>
-            <td class="{{ $isOutlier($probeta->altura_3,            'altura_3')            ? 'outlier' : '' }}">{{ $probeta->altura_3            ?? '—' }}</td>
-            <td class="td-left">{{ $nombreEns }}</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
         </tr>
-        @empty
-        <tr>
-            <td colspan="14" style="text-align:center; color:#aaa; padding:14px; font-style:italic;">
-                Sin probetas ensayadas registradas.
-            </td>
-        </tr>
-        @endforelse
+        @endfor
     </tbody>
 </table>
 
