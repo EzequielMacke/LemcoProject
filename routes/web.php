@@ -8,6 +8,7 @@ use App\Http\Controllers\InformeController;
 use App\Http\Controllers\RemisionController;
 use App\Http\Controllers\ObraController;
 use App\Http\Controllers\ObraExcelController;
+use App\Http\Controllers\PendienteController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\UsuarioController;
@@ -168,6 +169,10 @@ Route::middleware(Autenticado::class)->group(function () {
     Route::middleware('permiso:RPB,eliminar')->group(function () {
         Route::patch('/obras/{obra}/remisiones/{remision}/anular',  [RemisionController::class, 'anular'])->name('remisiones.anular');
         Route::patch('/obras/{obra}/remisiones/{remision}/activar', [RemisionController::class, 'activar'])->name('remisiones.activar');
+    });
+
+    Route::middleware('permiso:PEN')->group(function () {
+        Route::get('/pendientes', [PendienteController::class, 'index'])->name('pendientes.index');
     });
 
 });

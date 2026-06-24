@@ -129,6 +129,7 @@
         .menu-card:nth-child(4) { animation-delay: 0.24s; }
         .menu-card:nth-child(5) { animation-delay: 0.30s; }
         .menu-card:nth-child(6) { animation-delay: 0.36s; }
+        .menu-card:nth-child(7) { animation-delay: 0.42s; }
 
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(12px); }
@@ -157,6 +158,7 @@
         .card-obras::before    { background: #ea580c; }
         .card-envios::before   { background: #7c3aed; }
         .card-ensayos::before  { background: #e11d48; }
+        .card-pendientes::before { background: #4338ca; }
 
         /* Ícono */
         .card-icon {
@@ -175,6 +177,7 @@
         .icon-obras    { background: #fff7ed; color: #ea580c; }
         .icon-envios   { background: #f5f3ff; color: #7c3aed; }
         .icon-ensayos  { background: #fff1f2; color: #e11d48; }
+        .icon-pendientes { background: #eef2ff; color: #4338ca; }
 
         /* Texto — crece para llenar el espacio */
         .card-body { flex: 1; min-height: 0; }
@@ -462,6 +465,28 @@
             <div class="card-body">
                 <div class="card-label">Compresión</div>
                 <div class="card-desc">Registro y gestión de ensayos de compresión</div>
+            </div>
+            <div class="card-foot">
+                <span class="card-foot-label">Módulo</span>
+                <div class="card-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+        @endpermiso
+
+        @permiso('PEN')
+        <a href="{{ route('pendientes.index') }}" class="menu-card card-pendientes">
+            <div class="card-icon icon-pendientes">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="card-body">
+                <div class="card-label">Pendientes</div>
+                <div class="card-desc">Tareas y elementos a la espera de revisión</div>
             </div>
             <div class="card-foot">
                 <span class="card-foot-label">Módulo</span>

@@ -13,7 +13,7 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         // Área
-        $area = Area::create([
+        $area = Area::firstOrCreate([
             'descripcion' => 'Administrador',
         ]);
 
@@ -29,15 +29,19 @@ class AdminSeeder extends Seeder
             ['descripcion' => 'Ensayos de Compresion',      'abreviacion' => 'ENS'],
             ['descripcion' => 'Informe de probetas',        'abreviacion' => 'INF'],
             ['descripcion' => 'Certificación',              'abreviacion' => 'CER'],
+            ['descripcion' => 'Pendientes',                 'abreviacion' => 'PEN'],
         ];
 
         foreach ($modulos as $data) {
-            $modulo = Modulo::create($data);
+            $modulo = Modulo::firstOrCreate([
+                'abreviacion' => $data['abreviacion'],
+            ], $data);
 
             // Permiso de acceso total para el área administrador
-            Permiso::create([
+            Permiso::firstOrCreate([
                 'area_id'   => $area->id,
                 'modulo_id' => $modulo->id,
+            ], [
                 'ver'      => 1,
                 'agregar'  => 1,
                 'editar'   => 1,
@@ -46,8 +50,9 @@ class AdminSeeder extends Seeder
         }
 
         // Usuario admin
-        Usuario::create([
-            'nick'       => 'admin',
+        Usuario::firstOrCreate([
+            'nick' => 'admin',
+        ], [
             'contrasena' => '#Paraguari1_',
             'estado'     => 1,
             'envio'      => 0,
