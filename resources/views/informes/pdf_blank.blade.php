@@ -25,6 +25,7 @@
         .cab-logo img { max-height: 48px; max-width: 130px; }
         .cab-logo .logo-txt { font-size: 13px; font-weight: bold; letter-spacing: 2px; }
         .cab-titulo { width: 58%; padding: 8px 14px; border-right: 1.5px solid #000; text-align: center; }
+        .cab-titulo .titulo-sub  { font-size: 8.5px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
         .cab-titulo .titulo-main { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; line-height: 1.5; }
         .cab-fl { width: 22%; padding: 6px 10px; text-align: center; }
         .fl-code { font-size: 11px; font-weight: bold; letter-spacing: 1.5px; }
@@ -56,9 +57,14 @@
 
         /* Columna derecha: norma */
         .col-norma { width: 28%; padding: 10px 12px; text-align: center; vertical-align: middle !important; }
+        .norma-inner { width: 100%; border-collapse: collapse; }
+        .norma-inner td { vertical-align: middle; }
+        .norma-texto { text-align: left; padding-right: 6px; }
         .norma-lbl  { font-size: 6.5px; font-weight: bold; text-transform: uppercase; color: #555; margin-bottom: 6px; }
         .norma-val  { font-size: 11px; font-weight: bold; letter-spacing: 0.5px; line-height: 1.6; }
         .norma-anio { font-size: 9px; font-weight: bold; color: #333; }
+        .norma-img  { width: 36%; text-align: center; }
+        .norma-img img { max-width: 100%; max-height: 50px; }
 
         /* ════ TABLA PROBETAS ════ */
         table.probetas {
@@ -88,6 +94,8 @@
         .td-left { text-align: left !important; }
         .td-bold { font-weight: bold; }
         .td-avg  { background: #e8e8e8 !important; font-weight: bold; font-size: 8px; }
+        .unit { text-transform: none; }
+        .th-carga { width: 6%; }
 
         /* ════ FOOTER FIJO ════ */
         .footer {
@@ -118,9 +126,11 @@
         }
         .contacto-nombre { font-size: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
         .contacto-ciudad { font-size: 7px; color: #444; margin-top: 1px; }
+        .contacto-lugar  { font-size: 7px; color: #444; margin-top: 1px; }
         .contacto-sep    { border: none; border-top: 1px solid #ccc; margin: 3px 0; }
         .contacto-mail   { font-size: 7px; color: #1a1a8a; }
         .contacto-tel    { font-size: 7px; margin-top: 1px; }
+
     </style>
 </head>
 <body>
@@ -136,11 +146,12 @@
             @endif
         </td>
         <td class="cab-titulo">
+            <div class="titulo-sub">Informe de Ensayo de Probetas de Hormigón</div>
             <div class="titulo-main">Ensayo de Compresión Simple</div>
         </td>
         <td class="cab-fl">
             <div class="fl-code">FL-18</div>
-            <div class="fl-rev">Rev. 06</div>
+            <div class="fl-rev">Rev. 07</div>
         </td>
     </tr>
 </table>
@@ -190,9 +201,20 @@
 
         {{-- Norma de referencia --}}
         <td class="col-norma">
-            <div class="norma-lbl">Norma de referencia</div>
-            <div class="norma-val">ASTM C39/C39M</div>
-            <div class="norma-anio">2026</div>
+            <table class="norma-inner">
+                <tr>
+                    <td class="norma-texto">
+                        <div class="norma-lbl">Norma de referencia</div>
+                        <div class="norma-val">ASTM C39/C39M</div>
+                        <div class="norma-anio">2026</div>
+                    </td>
+                    <td class="norma-img">
+                        @if($simbolo)
+                            <img src="{{ $simbolo }}" alt="Símbolo">
+                        @endif
+                    </td>
+                </tr>
+            </table>
         </td>
     </tr>
 </table>
@@ -206,15 +228,16 @@
             <th>Elemento</th>
             <th>F. Moldeo</th>
             <th>Edad<br>(días)</th>
-            <th>Carga rotura<br>(kN)</th>
-            <th>Sección<br>(mm²)</th>
-            <th>Altura<br>(mm)</th>
-            <th>Diámetro<br>(mm)</th>
-            <th>Tensión<br>rotura (MPa)</th>
+            <th>FCK Teórico<br><span class="unit">(MPa)</span></th>
+            <th class="th-carga">Carga rotura<br><span class="unit">(kN)</span></th>
+            <th>Sección<br><span class="unit">(mm²)</span></th>
+            <th>Altura<br><span class="unit">(mm)</span></th>
+            <th>Diámetro<br><span class="unit">(mm)</span></th>
+            <th>Tensión rotura<br><span class="unit">(MPa)</span></th>
             <th>H/D</th>
             <th>C(H/D)</th>
-            <th>Tensión<br>corregida (MPa)</th>
-            <th>Tensión<br>promedio (MPa)</th>
+            <th>Tensión corregida<br><span class="unit">(MPa)</span></th>
+            <th>Tensión promedio<br><span class="unit">(MPa)</span></th>
             <th>Tipo<br>rotura</th>
             <th>Defecto</th>
         </tr>
@@ -237,6 +260,7 @@
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
+            <td>&nbsp;</td>
             <td class="td-left">&nbsp;</td>
         </tr>
         @endfor
@@ -247,11 +271,27 @@
 <div style="margin-top:6px; font-size:6.5px; color:#333; line-height:1.5;">
     <div style="margin-bottom:3px;">
         <span style="color:#cc0000; font-weight:bold;">(*)</span>
-        Las roturas tipo 5 o 6 indican roturas no satisfactorias, por lo tanto, este resultado no se deberá utilizar para el juzgamiento de la resistencia del hormigón.
+        Las roturas tipo 4, 5 o 6 indican roturas no satisfactorias, por lo tanto, este resultado no se deberá utilizar para el juzgamiento de la resistencia del hormigón.
+    </div>
+    <div style="margin-bottom:3px;">
+        La información sobre la probeta, como el número de identificación, el elemento cargado, la fecha de moldeo y la resistencia característica fue provista por el peticionario.
+    </div>
+    <div style="margin-bottom:3px;">
+        Los resultados expresan exclusivamente a las probetas ensayadas, el muestreo queda a cargo del cliente.
+    </div>
+    <div style="margin-bottom:3px;">
+        Las conclusiones que pueden inferirse de la interpretación de los resultados quedan a total criterio del cliente.
+    </div>
+    <div style="margin-bottom:3px;">
+        Laboratorio Acreditado en el ensayo de resistencia a la compresión de especímenes cilíndricos de concreto (ASTM C39/C39M-2026), por el organismo nacional de acreditación NP-ISO/IEC 17025:2018.
     </div>
     <div style="font-style:italic;">
         No se debe reproducir el informe completo ni parte del mismo sin la expresa autorización del laboratorio LEMCO.
     </div>
+</div>
+
+<div style="text-align:center; margin-top:8px; font-size:7.5px; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">
+    &mdash; Fin de Informe &mdash;
 </div>
 
 {{-- ══ FOOTER FIJO ══ --}}
@@ -261,7 +301,7 @@
             {{-- Número de informe --}}
             <td class="foot-ref">
                 <div class="foot-ref-lbl">Referencia</div>
-                <div class="foot-ref-val">Ref.: &nbsp;</div>
+                <div class="foot-ref-val">Inf Nº.: &nbsp;</div>
             </td>
 
             {{-- Firma --}}
@@ -276,6 +316,7 @@
                 <div class="contacto-box">
                     <div class="contacto-nombre">Soldado Ovelar 1027</div>
                     <div class="contacto-ciudad">Fernando de la Mora &mdash; Paraguay</div>
+                    <div class="contacto-lugar">Lugar de ensayo: LEMCO</div>
                     <hr class="contacto-sep">
                     <div class="contacto-mail">&#9993;&nbsp; consulta@lemco.com.py</div>
                     <div class="contacto-tel">&#9990;&nbsp; (595 21) 021 456 &nbsp;|&nbsp; +595 986 161 059</div>

@@ -470,6 +470,10 @@
         input.value = input.value.replace(/\D/g, '').slice(0, 7);
     }
 
+    function formatearFck(input) {
+        input.value = input.value.replace(/\D/g, '').slice(0, 2);
+    }
+
     function agregarGrupo(inicial = null) {
         const id = ++grupoCont;
         const container = document.getElementById('grupos-container');
@@ -529,7 +533,8 @@
                         </div>
                         <input type="number" name="grupos[${id}][fck]"
                             class="gl-input gl-input-fck"
-                            placeholder="25" min="1" step="1" inputmode="numeric" required>
+                            placeholder="25" min="1" max="99" step="1" inputmode="numeric"
+                            maxlength="2" oninput="formatearFck(this)" required>
                     </div>
                     <div class="gl-field">
                         <div class="gl-field-header">
