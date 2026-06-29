@@ -78,7 +78,7 @@
             line-height: 1.3;
         }
         table.probetas tbody td {
-            padding: 3.5px 4px;
+            padding: 8px 4px;
             font-size: 7.5px;
             text-align: center;
             border: 1px solid #ccc;
@@ -88,6 +88,8 @@
         .td-left { text-align: left !important; }
         .td-bold { font-weight: bold; }
         .td-avg  { background: #e8e8e8 !important; font-weight: bold; font-size: 8px; }
+        .unit { text-transform: none; }
+        .th-carga { width: 6%; }
 
         /* ════ FOOTER FIJO ════ */
         .footer {
@@ -268,15 +270,16 @@
             <th>Elemento</th>
             <th>F. Moldeo</th>
             <th>Edad<br>(días)</th>
-            <th>Carga rotura<br>(kN)</th>
-            <th>Sección<br>(mm²)</th>
-            <th>Altura<br>(mm)</th>
-            <th>Diámetro<br>(mm)</th>
-            <th>Tensión<br>rotura (MPa)</th>
+            <th>FCK Teórico<br><span class="unit">(MPa)</span></th>
+            <th class="th-carga">Carga rotura<br><span class="unit">(kN)</span></th>
+            <th>Sección<br><span class="unit">(mm²)</span></th>
+            <th>Altura<br><span class="unit">(mm)</span></th>
+            <th>Diámetro<br><span class="unit">(mm)</span></th>
+            <th>Tensión rotura<br><span class="unit">(MPa)</span></th>
             <th>H/D</th>
             <th>C(H/D)</th>
-            <th>Tensión<br>corregida (MPa)</th>
-            <th>Tensión<br>promedio (MPa)</th>
+            <th>Tensión corregida<br><span class="unit">(MPa)</span></th>
+            <th>Tensión promedio<br><span class="unit">(MPa)</span></th>
             <th>Tipo<br>rotura</th>
             <th>Defecto</th>
         </tr>
@@ -290,6 +293,7 @@
             <td class="td-left">{{ $p->elemento ?? '—' }}</td>
             <td>{{ $p->fecha_moldeo?->format('d/m/Y') ?? '—' }}</td>
             <td>{{ ($p->fecha_moldeo && $p->fecha_ensayo) ? $p->fecha_moldeo->diffInDays($p->fecha_ensayo) : '—' }}</td>
+            <td>{{ $p->fck ?? '—' }}</td>
             <td>{{ $p->carga_rotura !== null ? number_format($p->carga_rotura, 2) : '—' }}</td>
             <td>{{ $row['seccion'] !== null ? number_format($row['seccion'], 2) : '—' }}</td>
             <td>{{ $row['altura'] !== null ? number_format($row['altura'], 2) : '—' }}</td>
