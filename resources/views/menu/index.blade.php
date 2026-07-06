@@ -130,6 +130,7 @@
         .menu-card:nth-child(5) { animation-delay: 0.30s; }
         .menu-card:nth-child(6) { animation-delay: 0.36s; }
         .menu-card:nth-child(7) { animation-delay: 0.42s; }
+        .menu-card:nth-child(8) { animation-delay: 0.48s; }
 
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(12px); }
@@ -159,6 +160,7 @@
         .card-envios::before   { background: #7c3aed; }
         .card-ensayos::before  { background: #e11d48; }
         .card-pendientes::before { background: #4338ca; }
+        .card-buscador::before { background: #0d9488; }
 
         /* Ícono */
         .card-icon {
@@ -178,6 +180,7 @@
         .icon-envios   { background: #f5f3ff; color: #7c3aed; }
         .icon-ensayos  { background: #fff1f2; color: #e11d48; }
         .icon-pendientes { background: #eef2ff; color: #4338ca; }
+        .icon-buscador  { background: #f0fdfa; color: #0d9488; }
 
         /* Texto — crece para llenar el espacio */
         .card-body { flex: 1; min-height: 0; }
@@ -487,6 +490,28 @@
             <div class="card-body">
                 <div class="card-label">Pendientes</div>
                 <div class="card-desc">Tareas y elementos a la espera de revisión</div>
+            </div>
+            <div class="card-foot">
+                <span class="card-foot-label">Módulo</span>
+                <div class="card-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+        @endpermiso
+
+        @permiso('BUS')
+        <a href="{{ route('buscador.index') }}" class="menu-card card-buscador">
+            <div class="card-icon icon-buscador">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                </svg>
+            </div>
+            <div class="card-body">
+                <div class="card-label">Buscador general</div>
+                <div class="card-desc">Búsqueda rápida en todos los módulos</div>
             </div>
             <div class="card-foot">
                 <span class="card-foot-label">Módulo</span>

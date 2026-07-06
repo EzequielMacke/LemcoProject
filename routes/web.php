@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\BuscadorController;
 use App\Http\Controllers\CertificacionController;
 use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\EnsayoCompresionController;
@@ -173,6 +174,10 @@ Route::middleware(Autenticado::class)->group(function () {
 
     Route::middleware('permiso:PEN')->group(function () {
         Route::get('/pendientes', [PendienteController::class, 'index'])->name('pendientes.index');
+    });
+
+    Route::middleware('permiso:BUS')->group(function () {
+        Route::get('/buscador', [BuscadorController::class, 'index'])->name('buscador.index');
     });
 
 });
