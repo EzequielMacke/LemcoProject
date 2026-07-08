@@ -65,10 +65,30 @@
 
         /* ── Page header ── */
         .page-header {
+            display: flex; align-items: center; justify-content: space-between;
             animation: fadeUp 0.35s ease both;
         }
         .page-label   { font-size: 11.5px; font-weight: 600; color: #0284c7; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
         .page-heading { font-size: 20px; font-weight: 700; color: #0f172a; letter-spacing: -0.3px; }
+
+        .btn-outline {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: none; border: 1.5px solid #e9ecef; border-radius: 10px;
+            padding: 9px 16px; font-size: 13px; font-weight: 500;
+            color: #374151; text-decoration: none; cursor: pointer; font-family: 'Inter', sans-serif;
+            transition: all 0.15s;
+        }
+        .btn-outline:hover { background: #f8f9fa; border-color: #d1d5db; }
+        .btn-outline svg { width: 14px; height: 14px; }
+
+        /* ── Alertas ── */
+        .alert {
+            border-radius: 10px; padding: 12px 16px; font-size: 13px;
+            display: flex; align-items: center; gap: 10px;
+            animation: fadeUp 0.35s ease both;
+        }
+        .alert-success { background: #f0fdf4; border: 1.5px solid #bbf7d0; color: #15803d; }
+        .alert svg { width: 16px; height: 16px; flex-shrink: 0; }
 
         /* ── Grid de acciones ── */
         .acciones-grid {
@@ -185,9 +205,27 @@
 
     {{-- Header --}}
     <div class="page-header">
-        <div class="page-label">Módulo</div>
-        <div class="page-heading">Control de Equipos</div>
+        <div>
+            <div class="page-label">Módulo</div>
+            <div class="page-heading">Control de Equipos</div>
+        </div>
+        <a href="{{ route('control-equipos.registros') }}" class="btn-outline">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            Ver registros
+        </a>
     </div>
+
+    @if (session('success'))
+    <div class="alert alert-success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>{{ session('success') }}</span>
+    </div>
+    @endif
 
     {{-- Acciones --}}
     <div class="acciones-grid">
@@ -211,7 +249,7 @@
             </div>
         </a>
 
-        <a href="#" class="accion-card card-devolucion">
+        <a href="{{ route('control-equipos.devolucion') }}" class="accion-card card-devolucion">
             <div class="accion-icon icon-devolucion">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>

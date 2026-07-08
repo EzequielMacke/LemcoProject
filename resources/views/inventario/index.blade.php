@@ -112,6 +112,16 @@
         .btn-icon-delete { color: #dc2626; }
         .btn-icon-delete:hover { background: #fef2f2; border-color: #fecaca; }
 
+        .btn-icon-sm {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+            border: 1.5px solid #e9ecef; background: #fff;
+            cursor: pointer; transition: all 0.15s; padding: 0;
+        }
+        .btn-icon-sm svg { width: 12px; height: 12px; }
+        .btn-icon-info { color: #dc2626; }
+        .btn-icon-info:hover { background: #fef2f2; border-color: #fecaca; }
+
         .btn-danger {
             display: inline-flex; align-items: center; gap: 7px;
             background: linear-gradient(135deg, #b91c1c, #dc2626);
@@ -162,6 +172,25 @@
             box-shadow: 0 0 0 3px rgba(147,51,234,0.1);
         }
         .search-input::placeholder { color: #9ca3af; }
+
+        .toggle-wrap {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: #374151; font-weight: 500;
+            white-space: nowrap; cursor: pointer; user-select: none;
+        }
+        .toggle-switch { position: relative; width: 38px; height: 22px; flex-shrink: 0; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .toggle-slider {
+            position: absolute; inset: 0; cursor: pointer;
+            background: #d1d5db; border-radius: 99px; transition: background 0.2s;
+        }
+        .toggle-slider::before {
+            content: ''; position: absolute; height: 16px; width: 16px;
+            left: 3px; top: 3px; background: #fff; border-radius: 50%;
+            transition: transform 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        }
+        .toggle-switch input:checked + .toggle-slider { background: #9333ea; }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
 
         /* ── Table card ── */
         .table-card {
@@ -216,6 +245,8 @@
         }
         .td-muted   { color: #9ca3af; }
         .td-cantidad { font-weight: 700; color: #111827; }
+        .td-disponible    { color: #15803d; }
+        .td-no-disponible { color: #dc2626; }
         .th-actions { text-align: right; }
         .td-actions { text-align: right; overflow: visible; }
         .td-actions-inner { display: flex; gap: 6px; justify-content: flex-end; }
@@ -291,6 +322,19 @@
         .field input.is-invalid, .field select.is-invalid, .field textarea.is-invalid { border-color: #f87171; }
         .field-error { font-size: 12px; color: #be123c; }
         .field-hint { font-size: 11.5px; color: #9ca3af; }
+
+        .detalle-row {
+            display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+            padding-bottom: 10px; border-bottom: 1px solid #f8fafc;
+        }
+        .detalle-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .detalle-label { font-size: 12px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.4px; flex-shrink: 0; }
+        .detalle-value { font-size: 13.5px; font-weight: 600; color: #111827; text-align: right; }
+        .modal-section-title {
+            font-size: 11px; font-weight: 700; color: #9333ea; text-transform: uppercase;
+            letter-spacing: 0.6px; padding-top: 6px; margin-top: 2px;
+            border-top: 1px dashed #f1f3f5;
+        }
 
         .modal-foot {
             padding: 16px 22px;
@@ -404,6 +448,13 @@
                 autocomplete="off"
             >
         </div>
+        <label class="toggle-wrap">
+            <span class="toggle-switch">
+                <input type="checkbox" id="chk-solo-disponibles" onchange="aplicarFiltroInventario()">
+                <span class="toggle-slider"></span>
+            </span>
+            Mostrar solo disponibles
+        </label>
     </div>
     @endif
 
@@ -428,6 +479,7 @@
                 <col style="width: 120px;">
                 <col style="width: 120px;">
                 <col style="width: 90px;">
+                <col style="width: 110px;">
                 <col style="width: 130px;">
             </colgroup>
             <thead>
@@ -440,6 +492,7 @@
                     <th>N° Serie</th>
                     <th>Categoría</th>
                     <th>Cantidad Existente</th>
+                    <th>Cant. Disponible</th>
                     <th class="th-actions">Acción</th>
                 </tr>
             </thead>
@@ -456,7 +509,7 @@
                         ($inventario->equipo->observacion ?? '')
                     ));
                 @endphp
-                <tr class="fila-inventario" data-buscar="{{ $buscar }}">
+                <tr class="fila-inventario" data-buscar="{{ $buscar }}" data-disponible="{{ $inventario->cantidad_disponible }}">
                     <td class="td-id">{{ $inventario->id }}</td>
                     <td class="td-muted">{{ $inventario->equipo->abreviacion ?? '—' }}</td>
                     <td class="td-desc">
@@ -470,6 +523,32 @@
                     <td class="td-muted">{{ $inventario->equipo->numero_serie ?? '—' }}</td>
                     <td>{{ $inventario->equipo->categoria->descripcion ?? '—' }}</td>
                     <td class="td-cantidad">{{ $inventario->cantidad }}</td>
+                    <td class="td-cantidad {{ $inventario->cantidad_disponible == 0 ? 'td-no-disponible' : 'td-disponible' }}">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            {{ $inventario->cantidad_disponible }}
+                            @if($inventario->cantidad_disponible == 0 && $inventario->retiro_info)
+                            <button
+                                type="button"
+                                class="btn-icon-sm btn-icon-info"
+                                title="Ver quién lo retiró"
+                                data-abreviacion="{{ $inventario->equipo->abreviacion ?? '—' }}"
+                                data-equipo="{{ $inventario->equipo->nombre ?? '—' }}"
+                                data-marca="{{ $inventario->equipo->marca->descripcion ?? '—' }}"
+                                data-modelo="{{ $inventario->equipo->modelo ?? '—' }}"
+                                data-numero-serie="{{ $inventario->equipo->numero_serie ?? '—' }}"
+                                data-categoria="{{ $inventario->equipo->categoria->descripcion ?? '—' }}"
+                                data-obra="{{ $inventario->retiro_info['obra'] ?? '—' }}"
+                                data-retirado-por="{{ $inventario->retiro_info['retirado_por'] ?? '—' }}"
+                                data-fecha-retiro="{{ $inventario->retiro_info['fecha_retiro'] ?? '—' }}"
+                                onclick="abrirModalRetiroInfo(this)"
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
+                                </svg>
+                            </button>
+                            @endif
+                        </div>
+                    </td>
                     <td class="td-actions">
                         <div class="td-actions-inner">
                             @if($puedeEditar)
@@ -519,7 +598,7 @@
                 </tr>
                 @endforeach
                 <tr id="fila-sin-resultados" style="display: none;">
-                    <td colspan="9" style="text-align: center; padding: 32px; color: #9ca3af;">
+                    <td colspan="10" style="text-align: center; padding: 32px; color: #9ca3af;">
                         No se encontraron equipos que coincidan con la búsqueda
                     </td>
                 </tr>
@@ -814,6 +893,62 @@
 </div>
 @endif
 
+{{-- Modal: Info de retiro pendiente --}}
+<div class="modal-overlay" id="modal-retiro-info" onclick="cerrarEnOverlay(event, 'modal-retiro-info')">
+    <div class="modal" style="max-width: 380px;">
+        <div class="modal-head">
+            <span class="modal-title">Retiro pendiente</span>
+            <button type="button" class="modal-close" onclick="cerrarModal('modal-retiro-info')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="detalle-row">
+                <span class="detalle-label">Identificación</span>
+                <span class="detalle-value" id="ri-abreviacion">—</span>
+            </div>
+            <div class="detalle-row">
+                <span class="detalle-label">Equipo</span>
+                <span class="detalle-value" id="ri-equipo">—</span>
+            </div>
+            <div class="detalle-row">
+                <span class="detalle-label">Marca</span>
+                <span class="detalle-value" id="ri-marca">—</span>
+            </div>
+            <div class="detalle-row">
+                <span class="detalle-label">Modelo</span>
+                <span class="detalle-value" id="ri-modelo">—</span>
+            </div>
+            <div class="detalle-row">
+                <span class="detalle-label">N° Serie</span>
+                <span class="detalle-value" id="ri-numero-serie">—</span>
+            </div>
+            <div class="detalle-row">
+                <span class="detalle-label">Categoría</span>
+                <span class="detalle-value" id="ri-categoria">—</span>
+            </div>
+            <div class="modal-section-title">Datos del retiro</div>
+            <div class="detalle-row">
+                <span class="detalle-label">Obra</span>
+                <span class="detalle-value" id="ri-obra">—</span>
+            </div>
+            <div class="detalle-row">
+                <span class="detalle-label">Retirado por</span>
+                <span class="detalle-value" id="ri-retirado-por">—</span>
+            </div>
+            <div class="detalle-row">
+                <span class="detalle-label">Fecha de retiro</span>
+                <span class="detalle-value" id="ri-fecha-retiro">—</span>
+            </div>
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn-cancel" onclick="cerrarModal('modal-retiro-info')">Cerrar</button>
+        </div>
+    </div>
+</div>
+
 <script>
     function abrirModal(id) {
         document.getElementById(id).classList.add('open');
@@ -827,10 +962,13 @@
 
     function aplicarFiltroInventario() {
         const q = document.getElementById('buscador-inventario').value.toLowerCase().trim();
+        const soloDisponibles = document.getElementById('chk-solo-disponibles').checked;
         let visibles = 0;
 
         document.querySelectorAll('.fila-inventario').forEach(fila => {
-            const mostrar = !q || fila.dataset.buscar.includes(q);
+            const coincideBusqueda = !q || fila.dataset.buscar.includes(q);
+            const esDisponible = fila.dataset.disponible !== '0';
+            const mostrar = coincideBusqueda && (!soloDisponibles || esDisponible);
             fila.style.display = mostrar ? '' : 'none';
             if (mostrar) visibles++;
         });
@@ -865,6 +1003,19 @@
         document.getElementById('txt-eliminar-nombre').textContent = btn.dataset.nombre;
         document.getElementById('form-eliminar').action = '/equipos/' + btn.dataset.id + '/eliminar';
         abrirModal('modal-eliminar');
+    }
+
+    function abrirModalRetiroInfo(btn) {
+        document.getElementById('ri-abreviacion').textContent = btn.dataset.abreviacion || '—';
+        document.getElementById('ri-equipo').textContent = btn.dataset.equipo || '—';
+        document.getElementById('ri-marca').textContent = btn.dataset.marca || '—';
+        document.getElementById('ri-modelo').textContent = btn.dataset.modelo || '—';
+        document.getElementById('ri-numero-serie').textContent = btn.dataset.numeroSerie || '—';
+        document.getElementById('ri-categoria').textContent = btn.dataset.categoria || '—';
+        document.getElementById('ri-obra').textContent = btn.dataset.obra || '—';
+        document.getElementById('ri-retirado-por').textContent = btn.dataset.retiradoPor || '—';
+        document.getElementById('ri-fecha-retiro').textContent = btn.dataset.fechaRetiro || '—';
+        abrirModal('modal-retiro-info');
     }
 
     function actualizarCampoCantidad(modal = 'agregar') {

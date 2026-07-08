@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
+use App\Models\DetalleRetiro;
 use App\Models\Equipo;
 use App\Models\Marca;
 use App\Models\TipoEquipo;
@@ -108,17 +109,33 @@ class EquipoController extends Controller
             return response()->json(['message' => 'No se encontró ningún equipo activo con ese código QR.'], 404);
         }
 
+        $ultimoDetalle = DetalleRetiro::where('equipo_id', $equipo->id)
+            ->with(['retiro.obraRetiro', 'retiro.funcionarioRetiro'])
+            ->latest('id')
+            ->first();
+
+        $retiroPendiente = null;
+        if ($ultimoDetalle && is_null($ultimoDetalle->fecha_devolucion)) {
+            $retiroPendiente = [
+                'detalle_retiro_id' => $ultimoDetalle->id,
+                'obra'              => $ultimoDetalle->retiro?->obraRetiro?->descripcion,
+                'retirado_por'      => $ultimoDetalle->retiro?->funcionarioRetiro?->descripcion,
+                'fecha_retiro'      => optional($ultimoDetalle->fecha_retiro)->format('d/m/Y'),
+            ];
+        }
+
         return response()->json([
-            'id'            => $equipo->id,
-            'nombre'        => $equipo->nombre,
-            'abreviacion'   => $equipo->abreviacion,
-            'marca'         => $equipo->marca->descripcion ?? null,
-            'modelo'        => $equipo->modelo,
-            'numero_serie'  => $equipo->numero_serie,
-            'categoria'     => $equipo->categoria->descripcion ?? null,
-            'tipo_equipo'   => $equipo->tipoEquipo->descripcion ?? null,
-            'observacion'   => $equipo->observacion,
-            'codigo_qr'     => $equipo->codigo_qr,
+            'id'               => $equipo->id,
+            'nombre'           => $equipo->nombre,
+            'abreviacion'      => $equipo->abreviacion,
+            'marca'            => $equipo->marca->descripcion ?? null,
+            'modelo'           => $equipo->modelo,
+            'numero_serie'     => $equipo->numero_serie,
+            'categoria'        => $equipo->categoria->descripcion ?? null,
+            'tipo_equipo'      => $equipo->tipoEquipo->descripcion ?? null,
+            'observacion'      => $equipo->observacion,
+            'codigo_qr'        => $equipo->codigo_qr,
+            'retiro_pendiente' => $retiroPendiente,
         ]);
     }
 

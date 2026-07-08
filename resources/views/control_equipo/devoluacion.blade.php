@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Retiro de equipos — LemcoProject</title>
+    <title>Devolución de equipos — LemcoProject</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -70,17 +70,17 @@
             display: flex; align-items: center; justify-content: space-between;
             animation: fadeUp 0.35s ease both;
         }
-        .page-label   { font-size: 11.5px; font-weight: 600; color: #ea580c; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .page-label   { font-size: 11.5px; font-weight: 600; color: #15803d; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
         .page-heading { font-size: 20px; font-weight: 700; color: #0f172a; letter-spacing: -0.3px; }
 
         /* ── Buttons ── */
         .btn-primary {
             display: inline-flex; align-items: center; gap: 7px;
-            background: linear-gradient(135deg, #c2410c, #ea580c);
+            background: linear-gradient(135deg, #15803d, #16a34a);
             color: #fff; font-size: 13px; font-weight: 600;
             border: none; border-radius: 10px; padding: 10px 18px;
             cursor: pointer; font-family: 'Inter', sans-serif;
-            box-shadow: 0 3px 10px rgba(234,88,12,0.3);
+            box-shadow: 0 3px 10px rgba(21,128,61,0.3);
             transition: opacity 0.15s, transform 0.1s;
         }
         .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
@@ -96,17 +96,6 @@
             transition: all 0.15s;
         }
         .btn-cancel:hover { background: #f8f9fa; border-color: #d1d5db; color: #374151; }
-
-        .btn-danger {
-            display: inline-flex; align-items: center; gap: 7px;
-            background: linear-gradient(135deg, #b91c1c, #dc2626);
-            color: #fff; font-size: 13px; font-weight: 600;
-            border: none; border-radius: 10px; padding: 10px 18px;
-            cursor: pointer; font-family: 'Inter', sans-serif;
-            box-shadow: 0 3px 10px rgba(220,38,38,0.3);
-            transition: opacity 0.15s, transform 0.1s;
-        }
-        .btn-danger:hover { opacity: 0.9; transform: translateY(-1px); }
 
         .btn-icon {
             display: inline-flex; align-items: center; justify-content: center;
@@ -125,9 +114,7 @@
             display: flex; align-items: center; gap: 10px;
             animation: fadeUp 0.35s ease both;
         }
-        .alert-success { background: #f0fdf4; border: 1.5px solid #bbf7d0; color: #15803d; }
         .alert-error   { background: #fff1f2; border: 1.5px solid #fecdd3; color: #be123c; }
-        .alert-info    { background: #eff6ff; border: 1.5px solid #bfdbfe; color: #1d4ed8; }
         .alert svg { width: 16px; height: 16px; flex-shrink: 0; }
 
         /* ── Scanner card ── */
@@ -166,37 +153,6 @@
         .scanner-placeholder svg { width: 36px; height: 36px; color: #d1d5db; }
         .scanner-placeholder p { font-size: 13px; }
 
-        /* ── Datos del retiro ── */
-        .form-card {
-            background: #fff;
-            border: 1.5px solid #e9ecef;
-            border-radius: 18px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            animation: fadeUp 0.4s ease 0.02s both;
-            display: flex; flex-direction: column; gap: 14px;
-        }
-        .form-card-title { font-size: 14px; font-weight: 700; color: #111827; }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 14px;
-        }
-        .field { display: flex; flex-direction: column; gap: 5px; }
-        .field label { font-size: 12px; font-weight: 600; color: #374151; }
-        .field input {
-            width: 100%; border: 1.5px solid #e9ecef; border-radius: 10px;
-            padding: 10px 13px; font-size: 13.5px; color: #111827;
-            background: #fafafa; outline: none; font-family: 'Inter', sans-serif;
-            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
-        }
-        .field input:focus {
-            border-color: #ea580c; background: #fff;
-            box-shadow: 0 0 0 3px rgba(234,88,12,0.1);
-        }
-        .field input.is-invalid { border-color: #f87171; }
-        .field-error { font-size: 12px; color: #be123c; }
-
         /* ── Table card ── */
         .table-card {
             background: #fff;
@@ -213,8 +169,8 @@
         }
         .table-card-title { font-size: 14px; font-weight: 700; color: #111827; }
         .table-card-count {
-            font-size: 11.5px; font-weight: 700; color: #ea580c;
-            background: #fff7ed; border-radius: 99px; padding: 3px 10px;
+            font-size: 11.5px; font-weight: 700; color: #15803d;
+            background: #f0fdf4; border-radius: 99px; padding: 3px 10px;
         }
 
         .table-scroll { overflow-x: auto; }
@@ -310,14 +266,11 @@
 
         .aviso-pendiente {
             display: none;
-            flex-direction: column; gap: 8px;
+            align-items: center; gap: 10px;
             background: #fff1f2; border: 1.5px solid #fecdd3; color: #be123c;
-            border-radius: 10px; padding: 12px 14px;
+            border-radius: 10px; padding: 12px 14px; font-size: 13px; font-weight: 600;
         }
-        .aviso-pendiente-titulo { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; }
-        .aviso-pendiente-titulo svg { width: 16px; height: 16px; flex-shrink: 0; }
-        .aviso-pendiente-detalle { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; }
-        .aviso-pendiente-detalle span:first-child { font-weight: 600; color: #9f1239; }
+        .aviso-pendiente svg { width: 18px; height: 18px; flex-shrink: 0; }
 
         .modal-close {
             display: flex; align-items: center; justify-content: center;
@@ -374,7 +327,7 @@
             Volver
         </a>
         <div class="nav-sep"></div>
-        <span class="navbar-title">Retiro de equipos</span>
+        <span class="navbar-title">Devolución de equipos</span>
     </div>
     <div class="navbar-user">
         <div class="user-chip">{{ strtoupper(substr(session('usuario.nick'), 0, 1)) }}</div>
@@ -388,7 +341,7 @@
     <div class="page-header">
         <div>
             <div class="page-label">Control de Equipos</div>
-            <div class="page-heading">Retiro</div>
+            <div class="page-heading">Devolución</div>
         </div>
     </div>
 
@@ -400,41 +353,12 @@
         <span id="alerta-escaner-texto">No se pudo acceder a la cámara.</span>
     </div>
 
-    {{-- Datos del retiro --}}
-    <div class="form-card">
-        <div class="form-card-title">Datos del retiro</div>
-        <div class="form-grid">
-            <div class="field">
-                <label for="inp-obra">Obra</label>
-                <input type="text" id="inp-obra" name="obra" list="lista-obras"
-                       placeholder="Escriba o seleccione una obra" autocomplete="off">
-                <datalist id="lista-obras">
-                    @foreach($obras as $obra)
-                    <option value="{{ $obra->descripcion }}">
-                    @endforeach
-                </datalist>
-                <span class="field-error" id="error-obra"></span>
-            </div>
-            <div class="field">
-                <label for="inp-retirado-por">Retirado por</label>
-                <input type="text" id="inp-retirado-por" name="retirado_por" list="lista-funcionarios"
-                       placeholder="Escriba o seleccione quién retira" autocomplete="off">
-                <datalist id="lista-funcionarios">
-                    @foreach($funcionarios as $funcionario)
-                    <option value="{{ $funcionario->descripcion }}">
-                    @endforeach
-                </datalist>
-                <span class="field-error" id="error-retirado-por"></span>
-            </div>
-        </div>
-    </div>
-
     {{-- Escáner --}}
     <div class="scanner-card">
         <div class="scanner-head">
             <div>
                 <div class="scanner-title">Escanear código QR</div>
-                <div class="scanner-sub">Apuntá la cámara al QR del equipo para agregarlo a la lista de retiro</div>
+                <div class="scanner-sub">Apuntá la cámara al QR del equipo para agregarlo a la lista de devolución</div>
             </div>
             <button type="button" class="btn-primary" id="btn-escanear" onclick="alternarEscaneo()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -454,10 +378,10 @@
         </div>
     </div>
 
-    {{-- Lista de equipos a retirar --}}
+    {{-- Lista de equipos a devolver --}}
     <div class="table-card">
         <div class="table-card-head">
-            <span class="table-card-title">Equipos a retirar</span>
+            <span class="table-card-title">Equipos a devolver</span>
             <span class="table-card-count" id="contador-lista">0</span>
         </div>
         <div id="tabla-wrap">
@@ -474,8 +398,8 @@
                             <th>Identificación</th>
                             <th>Equipo</th>
                             <th>Marca</th>
-                            <th>Modelo</th>
-                            <th>Categoría</th>
+                            <th>Obra</th>
+                            <th>Retirado por</th>
                             <th class="th-actions">Acción</th>
                         </tr>
                     </thead>
@@ -486,11 +410,11 @@
     </div>
 
     <div style="display: flex; justify-content: flex-end;">
-        <button type="button" class="btn-primary" id="btn-guardar-retiro" onclick="guardarRetiro()" disabled>
+        <button type="button" class="btn-primary" id="btn-guardar-devolucion" onclick="guardarDevolucion()" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
             </svg>
-            <span id="btn-guardar-retiro-texto">Guardar retiro</span>
+            <span id="btn-guardar-devolucion-texto">Guardar devolución</span>
         </button>
     </div>
 
@@ -508,25 +432,11 @@
             </button>
         </div>
         <div class="modal-body" id="modal-detalle-body">
-            <div class="aviso-pendiente" id="aviso-retiro-pendiente">
-                <div class="aviso-pendiente-titulo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
-                    </svg>
-                    Este equipo tiene una devolución pendiente y no puede agregarse a la lista.
-                </div>
-                <div class="aviso-pendiente-detalle">
-                    <span>Obra</span>
-                    <span id="aviso-obra">—</span>
-                </div>
-                <div class="aviso-pendiente-detalle">
-                    <span>Retirado por</span>
-                    <span id="aviso-retirado-por">—</span>
-                </div>
-                <div class="aviso-pendiente-detalle">
-                    <span>Fecha de retiro</span>
-                    <span id="aviso-fecha-retiro">—</span>
-                </div>
+            <div class="aviso-pendiente" id="aviso-sin-pendiente">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                </svg>
+                Este equipo no tiene ninguna devolución pendiente.
             </div>
             <div class="detalle-row">
                 <span class="detalle-label">Identificación</span>
@@ -535,6 +445,18 @@
             <div class="detalle-row">
                 <span class="detalle-label">Nombre</span>
                 <span class="detalle-value" id="detalle-nombre">—</span>
+            </div>
+            <div class="detalle-row" id="detalle-obra-row" style="display: none;">
+                <span class="detalle-label">Obra</span>
+                <span class="detalle-value" id="detalle-obra">—</span>
+            </div>
+            <div class="detalle-row" id="detalle-retirado-por-row" style="display: none;">
+                <span class="detalle-label">Retirado por</span>
+                <span class="detalle-value" id="detalle-retirado-por">—</span>
+            </div>
+            <div class="detalle-row" id="detalle-fecha-retiro-row" style="display: none;">
+                <span class="detalle-label">Fecha de retiro</span>
+                <span class="detalle-value" id="detalle-fecha-retiro">—</span>
             </div>
             <div class="detalle-row">
                 <span class="detalle-label">Marca</span>
@@ -566,7 +488,7 @@
 
 <script>
     const urlBuscarQr = @json(route('equipos.buscar-por-qr', ['codigo' => '__CODIGO__']));
-    const urlGuardarRetiro = @json(route('control-equipos.retiro.store'));
+    const urlGuardarDevolucion = @json(route('control-equipos.devolucion.store'));
     const urlIndex = @json(route('control-equipos.index'));
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
@@ -575,7 +497,7 @@
     let procesandoResultado = false;
     let equipoPendiente = null;
 
-    const equiposRetiro = [];
+    const equiposDevolucion = [];
 
     function mostrarAlertaEscaner(texto) {
         document.getElementById('alerta-escaner-texto').textContent = texto;
@@ -633,8 +555,8 @@
                 return data;
             })
             .then((equipo) => {
-                if (equiposRetiro.some(e => e.id === equipo.id)) {
-                    mostrarAlertaEscaner('Ese equipo ya está en la lista de retiro.');
+                if (equiposDevolucion.some(e => e.id === equipo.id)) {
+                    mostrarAlertaEscaner('Ese equipo ya está en la lista de devolución.');
                     procesandoResultado = false;
                     return;
                 }
@@ -666,25 +588,34 @@
 
         const caja = document.getElementById('modal-detalle-caja');
         const titulo = document.getElementById('modal-detalle-titulo');
-        const aviso = document.getElementById('aviso-retiro-pendiente');
+        const aviso = document.getElementById('aviso-sin-pendiente');
         const btnConfirmar = document.getElementById('btn-confirmar-detalle');
         const btnCancelarTexto = document.getElementById('btn-cancelar-detalle-texto');
+        const obraRow = document.getElementById('detalle-obra-row');
+        const retiradoPorRow = document.getElementById('detalle-retirado-por-row');
+        const fechaRetiroRow = document.getElementById('detalle-fecha-retiro-row');
 
         if (equipo.retiro_pendiente) {
-            caja.classList.add('modal-danger');
-            titulo.textContent = 'Devolución pendiente';
-            document.getElementById('aviso-obra').textContent = equipo.retiro_pendiente.obra || '—';
-            document.getElementById('aviso-retirado-por').textContent = equipo.retiro_pendiente.retirado_por || '—';
-            document.getElementById('aviso-fecha-retiro').textContent = equipo.retiro_pendiente.fecha_retiro || '—';
-            aviso.style.display = 'flex';
-            btnConfirmar.style.display = 'none';
-            btnCancelarTexto.textContent = 'Cerrar';
-        } else {
             caja.classList.remove('modal-danger');
             titulo.textContent = 'Equipo escaneado';
             aviso.style.display = 'none';
+            document.getElementById('detalle-obra').textContent = equipo.retiro_pendiente.obra || '—';
+            document.getElementById('detalle-retirado-por').textContent = equipo.retiro_pendiente.retirado_por || '—';
+            document.getElementById('detalle-fecha-retiro').textContent = equipo.retiro_pendiente.fecha_retiro || '—';
+            obraRow.style.display = 'flex';
+            retiradoPorRow.style.display = 'flex';
+            fechaRetiroRow.style.display = 'flex';
             btnConfirmar.style.display = 'inline-flex';
             btnCancelarTexto.textContent = 'Cancelar';
+        } else {
+            caja.classList.add('modal-danger');
+            titulo.textContent = 'Sin devolución pendiente';
+            aviso.style.display = 'flex';
+            obraRow.style.display = 'none';
+            retiradoPorRow.style.display = 'none';
+            fechaRetiroRow.style.display = 'none';
+            btnConfirmar.style.display = 'none';
+            btnCancelarTexto.textContent = 'Cerrar';
         }
 
         document.getElementById('modal-detalle').classList.add('open');
@@ -705,15 +636,15 @@
     }
 
     function confirmarDetalle() {
-        if (!equipoPendiente || equipoPendiente.retiro_pendiente) return;
-        equiposRetiro.push(equipoPendiente);
+        if (!equipoPendiente || !equipoPendiente.retiro_pendiente) return;
+        equiposDevolucion.push(equipoPendiente);
         renderizarLista();
         cerrarModalDetalle();
     }
 
     function quitarEquipo(id) {
-        const idx = equiposRetiro.findIndex(e => e.id === id);
-        if (idx !== -1) equiposRetiro.splice(idx, 1);
+        const idx = equiposDevolucion.findIndex(e => e.id === id);
+        if (idx !== -1) equiposDevolucion.splice(idx, 1);
         renderizarLista();
     }
 
@@ -722,10 +653,10 @@
         const vacio  = document.getElementById('lista-vacia');
         const scroll = document.getElementById('tabla-scroll');
 
-        document.getElementById('contador-lista').textContent = equiposRetiro.length;
-        document.getElementById('btn-guardar-retiro').disabled = equiposRetiro.length === 0;
+        document.getElementById('contador-lista').textContent = equiposDevolucion.length;
+        document.getElementById('btn-guardar-devolucion').disabled = equiposDevolucion.length === 0;
 
-        if (equiposRetiro.length === 0) {
+        if (equiposDevolucion.length === 0) {
             vacio.style.display = 'block';
             scroll.style.display = 'none';
             return;
@@ -734,13 +665,13 @@
         vacio.style.display = 'none';
         scroll.style.display = 'block';
 
-        cuerpo.innerHTML = equiposRetiro.map(equipo => `
+        cuerpo.innerHTML = equiposDevolucion.map(equipo => `
             <tr>
                 <td class="td-muted" data-label="Identificación">${escaparHtml(equipo.abreviacion || '—')}</td>
                 <td class="td-desc" data-label="Equipo">${escaparHtml(equipo.nombre || '—')}</td>
                 <td data-label="Marca">${escaparHtml(equipo.marca || '—')}</td>
-                <td data-label="Modelo">${escaparHtml(equipo.modelo || '—')}</td>
-                <td data-label="Categoría">${escaparHtml(equipo.categoria || '—')}</td>
+                <td data-label="Obra">${escaparHtml(equipo.retiro_pendiente.obra || '—')}</td>
+                <td data-label="Retirado por">${escaparHtml(equipo.retiro_pendiente.retirado_por || '—')}</td>
                 <td class="td-actions">
                     <button type="button" class="btn-icon btn-icon-delete" title="Quitar" onclick="quitarEquipo(${equipo.id})">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -758,48 +689,20 @@
         return div.innerHTML;
     }
 
-    function limpiarErroresFormulario() {
-        document.getElementById('error-obra').textContent = '';
-        document.getElementById('error-retirado-por').textContent = '';
-        document.getElementById('inp-obra').classList.remove('is-invalid');
-        document.getElementById('inp-retirado-por').classList.remove('is-invalid');
-    }
-
-    function mostrarErrorCampo(campo, mensaje) {
-        document.getElementById('error-' + campo).textContent = mensaje;
-        document.getElementById('inp-' + campo).classList.add('is-invalid');
-    }
-
-    function guardarRetiro() {
-        limpiarErroresFormulario();
+    function guardarDevolucion() {
         ocultarAlertaEscaner();
 
-        const inpObra = document.getElementById('inp-obra');
-        const inpRetiradoPor = document.getElementById('inp-retirado-por');
-        const obra = inpObra.value.trim();
-        const retiradoPor = inpRetiradoPor.value.trim();
-
-        let valido = true;
-        if (!obra) {
-            mostrarErrorCampo('obra', 'La obra es obligatoria.');
-            valido = false;
-        }
-        if (!retiradoPor) {
-            mostrarErrorCampo('retirado-por', 'Este campo es obligatorio.');
-            valido = false;
-        }
-        if (equiposRetiro.length === 0) {
+        if (equiposDevolucion.length === 0) {
             mostrarAlertaEscaner('Agregá al menos un equipo a la lista antes de guardar.');
-            valido = false;
+            return;
         }
-        if (!valido) return;
 
-        const boton = document.getElementById('btn-guardar-retiro');
-        const botonTexto = document.getElementById('btn-guardar-retiro-texto');
+        const boton = document.getElementById('btn-guardar-devolucion');
+        const botonTexto = document.getElementById('btn-guardar-devolucion-texto');
         boton.disabled = true;
         botonTexto.textContent = 'Guardando...';
 
-        fetch(urlGuardarRetiro, {
+        fetch(urlGuardarDevolucion, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -807,15 +710,13 @@
                 'X-CSRF-TOKEN': csrfToken,
             },
             body: JSON.stringify({
-                obra: obra,
-                retirado_por: retiradoPor,
-                equipos: equiposRetiro.map(e => e.id),
+                detalles: equiposDevolucion.map(e => e.retiro_pendiente.detalle_retiro_id),
             }),
         })
             .then(async (res) => {
                 const data = await res.json();
                 if (!res.ok) {
-                    const err = new Error(data.message || 'No se pudo registrar el retiro.');
+                    const err = new Error(data.message || 'No se pudo registrar la devolución.');
                     err.errors = data.errors || null;
                     throw err;
                 }
@@ -825,17 +726,15 @@
                 window.location.href = urlIndex;
             })
             .catch((err) => {
-                if (err.errors) {
-                    if (err.errors.obra) mostrarErrorCampo('obra', err.errors.obra[0]);
-                    if (err.errors.retirado_por) mostrarErrorCampo('retirado-por', err.errors.retirado_por[0]);
-                    if (err.errors.equipos) mostrarAlertaEscaner(err.errors.equipos[0]);
+                if (err.errors && err.errors.detalles) {
+                    mostrarAlertaEscaner(err.errors.detalles[0]);
                 } else {
                     mostrarAlertaEscaner(err.message);
                 }
             })
             .finally(() => {
-                boton.disabled = equiposRetiro.length === 0;
-                botonTexto.textContent = 'Guardar retiro';
+                boton.disabled = equiposDevolucion.length === 0;
+                botonTexto.textContent = 'Guardar devolución';
             });
     }
 </script>
