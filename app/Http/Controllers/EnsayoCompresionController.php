@@ -100,7 +100,7 @@ class EnsayoCompresionController extends Controller
             ->join('remisiones', 'probetas.remision_id', '=', 'remisiones.id')
             ->whereNotNull('probetas.fecha_ensayo')
             ->whereNotNull('probetas.ensayo_por')
-            ->whereRaw('DATE_ADD(probetas.fecha_moldeo, INTERVAL probetas.edad_ensayo DAY) <= ?', [$fecha])
+            ->whereRaw('DATE_ADD(probetas.fecha_moldeo, INTERVAL probetas.edad_ensayo DAY) = ?', [$fecha])
             ->distinct()
             ->pluck('remisiones.obra_id');
 

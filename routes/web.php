@@ -4,8 +4,11 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\BuscadorController;
 use App\Http\Controllers\CertificacionController;
 use App\Http\Controllers\ContactoController;
+use App\Http\Controllers\ControlEquipoController;
 use App\Http\Controllers\EnsayoCompresionController;
+use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\InformeController;
+use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\RemisionController;
 use App\Http\Controllers\ObraController;
 use App\Http\Controllers\ObraExcelController;
@@ -40,6 +43,10 @@ Route::middleware(Autenticado::class)->group(function () {
         $datosFaltantes = collect($campos)->filter(fn($c) => blank($persona?->$c))->count();
         return view('menu.index', compact('datosFaltantes'));
     })->name('menu.index');
+
+    Route::get('/control-equipos',        [ControlEquipoController::class, 'index'])->name('control-equipos.index');
+    Route::get('/control-equipos/retiro', [ControlEquipoController::class, 'retiro'])->name('control-equipos.retiro');
+    Route::get('/equipos/qr/{codigo}',    [EquipoController::class, 'buscarPorQr'])->name('equipos.buscar-por-qr');
 
     Route::middleware('permiso:DAT')->group(function () {
         Route::get('/personas', [PersonaController::class, 'index'])->name('personas.index');
@@ -178,6 +185,21 @@ Route::middleware(Autenticado::class)->group(function () {
 
     Route::middleware('permiso:BUS')->group(function () {
         Route::get('/buscador', [BuscadorController::class, 'index'])->name('buscador.index');
+    });
+
+    Route::middleware('permiso:INV')->group(function () {
+        Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario.index');
+        Route::get('/equipos/qr-todos', [EquipoController::class, 'qrTodos'])->name('equipos.qr-todos');
+        Route::get('/equipos/{equipo}/qr', [EquipoController::class, 'qr'])->name('equipos.qr');
+    });
+    Route::middleware('permiso:INV,agregar')->group(function () {
+        Route::post('/equipos', [EquipoController::class, 'store'])->name('equipos.store');
+    });
+    Route::middleware('permiso:INV,editar')->group(function () {
+        Route::put('/equipos/{equipo}', [EquipoController::class, 'update'])->name('equipos.update');
+    });
+    Route::middleware('permiso:INV,eliminar')->group(function () {
+        Route::patch('/equipos/{equipo}/eliminar', [EquipoController::class, 'eliminar'])->name('equipos.eliminar');
     });
 
 });
