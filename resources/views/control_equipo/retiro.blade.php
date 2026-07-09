@@ -476,6 +476,7 @@
                             <th>Marca</th>
                             <th>Modelo</th>
                             <th>Categoría</th>
+                            <th>Cantidad</th>
                             <th class="th-actions">Acción</th>
                         </tr>
                     </thead>
@@ -555,6 +556,11 @@
             <div class="detalle-row" id="detalle-obs-row" style="display: none;">
                 <span class="detalle-label">Observación</span>
                 <span class="detalle-obs" id="detalle-observacion">—</span>
+            </div>
+            <div class="field" id="campo-cantidad-row" style="display: none;">
+                <label for="inp-cantidad-retiro">Cantidad a retirar</label>
+                <input type="number" id="inp-cantidad-retiro" min="1" step="1" placeholder="Ingrese la cantidad" oninput="limitarCantidadRetiro(this)">
+                <span class="field-error" id="error-cantidad-retiro"></span>
             </div>
         </div>
         <div class="modal-foot">
@@ -638,6 +644,11 @@
                     procesandoResultado = false;
                     return;
                 }
+                if (Number(equipo.tipo_equipo_id) === 2 && Number(equipo.cantidad_disponible) <= 0) {
+                    mostrarAlertaEscaner('No hay cantidad disponible de este equipo. Falta la devolución.');
+                    procesandoResultado = false;
+                    return;
+                }
                 ocultarAlertaEscaner();
                 abrirModalDetalle(equipo);
             })
@@ -645,6 +656,14 @@
                 mostrarAlertaEscaner(err.message);
                 procesandoResultado = false;
             });
+    }
+
+    function limitarCantidadRetiro(input) {
+        const max = Number(input.max);
+        if (!max) return;
+        if (Number(input.value) > max) {
+            input.value = max;
+        }
     }
 
     function abrirModalDetalle(equipo) {
@@ -662,6 +681,19 @@
             obsRow.style.display = 'flex';
         } else {
             obsRow.style.display = 'none';
+        }
+
+        const campoCantidadRow = document.getElementById('campo-cantidad-row');
+        const inpCantidad = document.getElementById('inp-cantidad-retiro');
+        document.getElementById('error-cantidad-retiro').textContent = '';
+        inpCantidad.classList.remove('is-invalid');
+        if (Number(equipo.tipo_equipo_id) === 2 && !equipo.retiro_pendiente) {
+            inpCantidad.value = '';
+            inpCantidad.max = equipo.cantidad_disponible ?? '';
+            inpCantidad.placeholder = `Cantidad máxima: ${equipo.cantidad_disponible ?? 0}`;
+            campoCantidadRow.style.display = 'flex';
+        } else {
+            campoCantidadRow.style.display = 'none';
         }
 
         const caja = document.getElementById('modal-detalle-caja');
@@ -706,6 +738,26 @@
 
     function confirmarDetalle() {
         if (!equipoPendiente || equipoPendiente.retiro_pendiente) return;
+
+        if (Number(equipoPendiente.tipo_equipo_id) === 2) {
+            const inpCantidad = document.getElementById('inp-cantidad-retiro');
+            const cantidad = parseInt(inpCantidad.value, 10);
+            const disponible = Number(equipoPendiente.cantidad_disponible) || 0;
+            if (!cantidad || cantidad < 1) {
+                inpCantidad.classList.add('is-invalid');
+                document.getElementById('error-cantidad-retiro').textContent = 'La cantidad es obligatoria.';
+                return;
+            }
+            if (cantidad > disponible) {
+                inpCantidad.classList.add('is-invalid');
+                document.getElementById('error-cantidad-retiro').textContent = `La cantidad máxima disponible es ${disponible}.`;
+                return;
+            }
+            equipoPendiente.cantidad = cantidad;
+        } else {
+            equipoPendiente.cantidad = 1;
+        }
+
         equiposRetiro.push(equipoPendiente);
         renderizarLista();
         cerrarModalDetalle();
@@ -741,6 +793,7 @@
                 <td data-label="Marca">${escaparHtml(equipo.marca || '—')}</td>
                 <td data-label="Modelo">${escaparHtml(equipo.modelo || '—')}</td>
                 <td data-label="Categoría">${escaparHtml(equipo.categoria || '—')}</td>
+                <td data-label="Cantidad">${escaparHtml(String(equipo.cantidad ?? 1))}</td>
                 <td class="td-actions">
                     <button type="button" class="btn-icon btn-icon-delete" title="Quitar" onclick="quitarEquipo(${equipo.id})">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -809,7 +862,7 @@
             body: JSON.stringify({
                 obra: obra,
                 retirado_por: retiradoPor,
-                equipos: equiposRetiro.map(e => e.id),
+                equipos: equiposRetiro.map(e => ({ id: e.id, cantidad: e.cantidad ?? 1 })),
             }),
         })
             .then(async (res) => {

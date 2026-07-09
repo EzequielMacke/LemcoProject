@@ -304,6 +304,35 @@
             flex-shrink: 0;
         }
 
+        /* ── Pestañas de retiros (equipos tipo "No identificable") ── */
+        .tabs-bar {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            padding-bottom: 4px;
+        }
+        .tab-btn {
+            border: 1.5px solid #e9ecef; background: #fff; border-radius: 8px;
+            padding: 6px 10px; font-size: 12px; font-weight: 600; color: #6b7280;
+            cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s;
+        }
+        .tab-btn:hover { border-color: #bbf7d0; color: #15803d; }
+        .tab-btn.active { background: #f0fdf4; border-color: #15803d; color: #15803d; }
+        .tab-btn.tiene-cantidad::after { content: '●'; margin-left: 5px; font-size: 8px; color: #15803d; }
+
+        .field { display: flex; flex-direction: column; gap: 5px; }
+        .field label { font-size: 12px; font-weight: 600; color: #374151; }
+        .field input {
+            width: 100%; border: 1.5px solid #e9ecef; border-radius: 10px;
+            padding: 10px 13px; font-size: 13.5px; color: #111827;
+            background: #fafafa; outline: none; font-family: 'Inter', sans-serif;
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+        }
+        .field input:focus {
+            border-color: #15803d; background: #fff;
+            box-shadow: 0 0 0 3px rgba(21,128,61,0.1);
+        }
+        .field input.is-invalid { border-color: #f87171; }
+        .field-error { font-size: 12px; color: #be123c; }
+
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(10px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -400,6 +429,7 @@
                             <th>Marca</th>
                             <th>Obra</th>
                             <th>Retirado por</th>
+                            <th>Cantidad</th>
                             <th class="th-actions">Acción</th>
                         </tr>
                     </thead>
@@ -446,17 +476,43 @@
                 <span class="detalle-label">Nombre</span>
                 <span class="detalle-value" id="detalle-nombre">—</span>
             </div>
-            <div class="detalle-row" id="detalle-obra-row" style="display: none;">
-                <span class="detalle-label">Obra</span>
-                <span class="detalle-value" id="detalle-obra">—</span>
+            <div id="bloque-tipo1" style="display: none;">
+                <div class="detalle-row" id="detalle-obra-row">
+                    <span class="detalle-label">Obra</span>
+                    <span class="detalle-value" id="detalle-obra">—</span>
+                </div>
+                <div class="detalle-row" id="detalle-retirado-por-row">
+                    <span class="detalle-label">Retirado por</span>
+                    <span class="detalle-value" id="detalle-retirado-por">—</span>
+                </div>
+                <div class="detalle-row" id="detalle-fecha-retiro-row">
+                    <span class="detalle-label">Fecha de retiro</span>
+                    <span class="detalle-value" id="detalle-fecha-retiro">—</span>
+                </div>
             </div>
-            <div class="detalle-row" id="detalle-retirado-por-row" style="display: none;">
-                <span class="detalle-label">Retirado por</span>
-                <span class="detalle-value" id="detalle-retirado-por">—</span>
-            </div>
-            <div class="detalle-row" id="detalle-fecha-retiro-row" style="display: none;">
-                <span class="detalle-label">Fecha de retiro</span>
-                <span class="detalle-value" id="detalle-fecha-retiro">—</span>
+            <div id="bloque-tipo2" style="display: none; flex-direction: column; gap: 12px;">
+                <div class="tabs-bar" id="tabs-retiros"></div>
+                <div class="detalle-row">
+                    <span class="detalle-label">Obra</span>
+                    <span class="detalle-value" id="tab-obra">—</span>
+                </div>
+                <div class="detalle-row">
+                    <span class="detalle-label">Retirado por</span>
+                    <span class="detalle-value" id="tab-retirado-por">—</span>
+                </div>
+                <div class="detalle-row">
+                    <span class="detalle-label">Fecha de retiro</span>
+                    <span class="detalle-value" id="tab-fecha-retiro">—</span>
+                </div>
+                <div class="detalle-row">
+                    <span class="detalle-label">Cantidad pendiente</span>
+                    <span class="detalle-value" id="tab-cantidad-pendiente">—</span>
+                </div>
+                <div class="field">
+                    <label for="inp-cantidad-devolver">Cantidad a devolver</label>
+                    <input type="number" id="inp-cantidad-devolver" min="1" step="1" placeholder="Ingrese la cantidad" oninput="limitarCantidadDevolucion(this)">
+                    <span class="field-error" id="error-cantidad-devolver"></span>
+                </div>
             </div>
             <div class="detalle-row">
                 <span class="detalle-label">Marca</span>
@@ -496,6 +552,8 @@
     let escaneando = false;
     let procesandoResultado = false;
     let equipoPendiente = null;
+    let tabActivaId = null;
+    let cantidadesTabTemp = {};
 
     const equiposDevolucion = [];
 
@@ -555,7 +613,8 @@
                 return data;
             })
             .then((equipo) => {
-                if (equiposDevolucion.some(e => e.id === equipo.id)) {
+                if (Number(equipo.tipo_equipo_id) !== 2 && equipo.retiro_pendiente &&
+                    equiposDevolucion.some(e => e.detalle_retiro_id === equipo.retiro_pendiente.detalle_retiro_id)) {
                     mostrarAlertaEscaner('Ese equipo ya está en la lista de devolución.');
                     procesandoResultado = false;
                     return;
@@ -591,40 +650,115 @@
         const aviso = document.getElementById('aviso-sin-pendiente');
         const btnConfirmar = document.getElementById('btn-confirmar-detalle');
         const btnCancelarTexto = document.getElementById('btn-cancelar-detalle-texto');
-        const obraRow = document.getElementById('detalle-obra-row');
-        const retiradoPorRow = document.getElementById('detalle-retirado-por-row');
-        const fechaRetiroRow = document.getElementById('detalle-fecha-retiro-row');
+        const bloqueTipo1 = document.getElementById('bloque-tipo1');
+        const bloqueTipo2 = document.getElementById('bloque-tipo2');
 
-        if (equipo.retiro_pendiente) {
-            caja.classList.remove('modal-danger');
-            titulo.textContent = 'Equipo escaneado';
-            aviso.style.display = 'none';
-            document.getElementById('detalle-obra').textContent = equipo.retiro_pendiente.obra || '—';
-            document.getElementById('detalle-retirado-por').textContent = equipo.retiro_pendiente.retirado_por || '—';
-            document.getElementById('detalle-fecha-retiro').textContent = equipo.retiro_pendiente.fecha_retiro || '—';
-            obraRow.style.display = 'flex';
-            retiradoPorRow.style.display = 'flex';
-            fechaRetiroRow.style.display = 'flex';
-            btnConfirmar.style.display = 'inline-flex';
-            btnCancelarTexto.textContent = 'Cancelar';
+        if (Number(equipo.tipo_equipo_id) === 2) {
+            bloqueTipo1.style.display = 'none';
+
+            const pendientes = equipo.retiros_pendientes || [];
+            if (pendientes.length === 0) {
+                caja.classList.add('modal-danger');
+                titulo.textContent = 'Sin devolución pendiente';
+                aviso.style.display = 'flex';
+                bloqueTipo2.style.display = 'none';
+                btnConfirmar.style.display = 'none';
+                btnCancelarTexto.textContent = 'Cerrar';
+            } else {
+                caja.classList.remove('modal-danger');
+                titulo.textContent = 'Equipo escaneado';
+                aviso.style.display = 'none';
+                bloqueTipo2.style.display = 'flex';
+                btnConfirmar.style.display = 'inline-flex';
+                btnCancelarTexto.textContent = 'Cancelar';
+
+                cantidadesTabTemp = {};
+                pendientes.forEach((p) => {
+                    const existente = equiposDevolucion.find(e => e.detalle_retiro_id === p.detalle_retiro_id);
+                    cantidadesTabTemp[p.detalle_retiro_id] = existente ? String(existente.cantidad) : '';
+                });
+
+                renderizarTabs(pendientes);
+                seleccionarTab(pendientes[0].detalle_retiro_id);
+            }
         } else {
-            caja.classList.add('modal-danger');
-            titulo.textContent = 'Sin devolución pendiente';
-            aviso.style.display = 'flex';
-            obraRow.style.display = 'none';
-            retiradoPorRow.style.display = 'none';
-            fechaRetiroRow.style.display = 'none';
-            btnConfirmar.style.display = 'none';
-            btnCancelarTexto.textContent = 'Cerrar';
+            bloqueTipo2.style.display = 'none';
+
+            if (equipo.retiro_pendiente) {
+                caja.classList.remove('modal-danger');
+                titulo.textContent = 'Equipo escaneado';
+                aviso.style.display = 'none';
+                document.getElementById('detalle-obra').textContent = equipo.retiro_pendiente.obra || '—';
+                document.getElementById('detalle-retirado-por').textContent = equipo.retiro_pendiente.retirado_por || '—';
+                document.getElementById('detalle-fecha-retiro').textContent = equipo.retiro_pendiente.fecha_retiro || '—';
+                bloqueTipo1.style.display = 'block';
+                btnConfirmar.style.display = 'inline-flex';
+                btnCancelarTexto.textContent = 'Cancelar';
+            } else {
+                caja.classList.add('modal-danger');
+                titulo.textContent = 'Sin devolución pendiente';
+                aviso.style.display = 'flex';
+                bloqueTipo1.style.display = 'none';
+                btnConfirmar.style.display = 'none';
+                btnCancelarTexto.textContent = 'Cerrar';
+            }
         }
 
         document.getElementById('modal-detalle').classList.add('open');
+    }
+
+    function renderizarTabs(pendientes) {
+        const cont = document.getElementById('tabs-retiros');
+        cont.innerHTML = pendientes.map((p, idx) => `
+            <button type="button" class="tab-btn" data-detalle-id="${p.detalle_retiro_id}" onclick="seleccionarTab(${p.detalle_retiro_id})">
+                Retiro ${idx + 1}
+            </button>
+        `).join('');
+    }
+
+    function seleccionarTab(detalleId) {
+        if (tabActivaId !== null) {
+            cantidadesTabTemp[tabActivaId] = document.getElementById('inp-cantidad-devolver').value;
+        }
+
+        tabActivaId = detalleId;
+        const pendientes = (equipoPendiente && equipoPendiente.retiros_pendientes) || [];
+        const p = pendientes.find(x => x.detalle_retiro_id === detalleId);
+        if (!p) return;
+
+        document.querySelectorAll('#tabs-retiros .tab-btn').forEach((btn) => {
+            const id = Number(btn.dataset.detalleId);
+            btn.classList.toggle('active', id === detalleId);
+            btn.classList.toggle('tiene-cantidad', !!cantidadesTabTemp[id]);
+        });
+
+        document.getElementById('tab-obra').textContent = p.obra || '—';
+        document.getElementById('tab-retirado-por').textContent = p.retirado_por || '—';
+        document.getElementById('tab-fecha-retiro').textContent = p.fecha_retiro || '—';
+        document.getElementById('tab-cantidad-pendiente').textContent = p.cantidad_pendiente;
+
+        const inpCantidad = document.getElementById('inp-cantidad-devolver');
+        inpCantidad.max = p.cantidad_pendiente;
+        inpCantidad.placeholder = `Cantidad máxima: ${p.cantidad_pendiente}`;
+        inpCantidad.value = cantidadesTabTemp[detalleId] || '';
+        inpCantidad.classList.remove('is-invalid');
+        document.getElementById('error-cantidad-devolver').textContent = '';
+    }
+
+    function limitarCantidadDevolucion(input) {
+        const max = Number(input.max);
+        if (!max) return;
+        if (Number(input.value) > max) {
+            input.value = max;
+        }
     }
 
     function cerrarModalDetalle() {
         document.getElementById('modal-detalle').classList.remove('open');
         equipoPendiente = null;
         procesandoResultado = false;
+        tabActivaId = null;
+        cantidadesTabTemp = {};
     }
 
     function cerrarEnOverlay(e) {
@@ -636,14 +770,81 @@
     }
 
     function confirmarDetalle() {
-        if (!equipoPendiente || !equipoPendiente.retiro_pendiente) return;
-        equiposDevolucion.push(equipoPendiente);
+        if (!equipoPendiente) return;
+
+        if (Number(equipoPendiente.tipo_equipo_id) === 2) {
+            const pendientes = equipoPendiente.retiros_pendientes || [];
+            if (pendientes.length === 0) return;
+
+            if (tabActivaId !== null) {
+                cantidadesTabTemp[tabActivaId] = document.getElementById('inp-cantidad-devolver').value;
+            }
+
+            const seleccionados = [];
+            for (const p of pendientes) {
+                const valor = cantidadesTabTemp[p.detalle_retiro_id];
+                if (!valor) continue;
+
+                const cantidad = parseInt(valor, 10);
+                if (!cantidad || cantidad < 1 || cantidad > p.cantidad_pendiente) {
+                    seleccionarTab(p.detalle_retiro_id);
+                    const inp = document.getElementById('inp-cantidad-devolver');
+                    inp.classList.add('is-invalid');
+                    document.getElementById('error-cantidad-devolver').textContent = `Ingresá una cantidad válida (máximo ${p.cantidad_pendiente}).`;
+                    return;
+                }
+                seleccionados.push({ p, cantidad });
+            }
+
+            if (seleccionados.length === 0) {
+                const inp = document.getElementById('inp-cantidad-devolver');
+                inp.classList.add('is-invalid');
+                document.getElementById('error-cantidad-devolver').textContent = 'Ingresá al menos una cantidad a devolver.';
+                return;
+            }
+
+            seleccionados.forEach(({ p, cantidad }) => {
+                agregarOActualizarDetalle({
+                    detalle_retiro_id: p.detalle_retiro_id,
+                    equipo_id: equipoPendiente.id,
+                    cantidad: cantidad,
+                    abreviacion: equipoPendiente.abreviacion,
+                    nombre: equipoPendiente.nombre,
+                    marca: equipoPendiente.marca,
+                    obra: p.obra,
+                    retirado_por: p.retirado_por,
+                });
+            });
+        } else {
+            if (!equipoPendiente.retiro_pendiente) return;
+
+            agregarOActualizarDetalle({
+                detalle_retiro_id: equipoPendiente.retiro_pendiente.detalle_retiro_id,
+                equipo_id: equipoPendiente.id,
+                cantidad: 1,
+                abreviacion: equipoPendiente.abreviacion,
+                nombre: equipoPendiente.nombre,
+                marca: equipoPendiente.marca,
+                obra: equipoPendiente.retiro_pendiente.obra,
+                retirado_por: equipoPendiente.retiro_pendiente.retirado_por,
+            });
+        }
+
         renderizarLista();
         cerrarModalDetalle();
     }
 
-    function quitarEquipo(id) {
-        const idx = equiposDevolucion.findIndex(e => e.id === id);
+    function agregarOActualizarDetalle(item) {
+        const idx = equiposDevolucion.findIndex(e => e.detalle_retiro_id === item.detalle_retiro_id);
+        if (idx !== -1) {
+            equiposDevolucion[idx] = item;
+        } else {
+            equiposDevolucion.push(item);
+        }
+    }
+
+    function quitarDetalle(detalleId) {
+        const idx = equiposDevolucion.findIndex(e => e.detalle_retiro_id === detalleId);
         if (idx !== -1) equiposDevolucion.splice(idx, 1);
         renderizarLista();
     }
@@ -665,15 +866,16 @@
         vacio.style.display = 'none';
         scroll.style.display = 'block';
 
-        cuerpo.innerHTML = equiposDevolucion.map(equipo => `
+        cuerpo.innerHTML = equiposDevolucion.map(item => `
             <tr>
-                <td class="td-muted" data-label="Identificación">${escaparHtml(equipo.abreviacion || '—')}</td>
-                <td class="td-desc" data-label="Equipo">${escaparHtml(equipo.nombre || '—')}</td>
-                <td data-label="Marca">${escaparHtml(equipo.marca || '—')}</td>
-                <td data-label="Obra">${escaparHtml(equipo.retiro_pendiente.obra || '—')}</td>
-                <td data-label="Retirado por">${escaparHtml(equipo.retiro_pendiente.retirado_por || '—')}</td>
+                <td class="td-muted" data-label="Identificación">${escaparHtml(item.abreviacion || '—')}</td>
+                <td class="td-desc" data-label="Equipo">${escaparHtml(item.nombre || '—')}</td>
+                <td data-label="Marca">${escaparHtml(item.marca || '—')}</td>
+                <td data-label="Obra">${escaparHtml(item.obra || '—')}</td>
+                <td data-label="Retirado por">${escaparHtml(item.retirado_por || '—')}</td>
+                <td data-label="Cantidad">${escaparHtml(String(item.cantidad))}</td>
                 <td class="td-actions">
-                    <button type="button" class="btn-icon btn-icon-delete" title="Quitar" onclick="quitarEquipo(${equipo.id})">
+                    <button type="button" class="btn-icon btn-icon-delete" title="Quitar" onclick="quitarDetalle(${item.detalle_retiro_id})">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
@@ -710,7 +912,7 @@
                 'X-CSRF-TOKEN': csrfToken,
             },
             body: JSON.stringify({
-                detalles: equiposDevolucion.map(e => e.retiro_pendiente.detalle_retiro_id),
+                detalles: equiposDevolucion.map(e => ({ detalle_retiro_id: e.detalle_retiro_id, cantidad: e.cantidad })),
             }),
         })
             .then(async (res) => {

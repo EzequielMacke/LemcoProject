@@ -30,10 +30,11 @@ class ControlEquipoController extends Controller
     public function storeRetiro(Request $request): JsonResponse
     {
         $request->validate([
-            'obra'         => 'required|string|max:150',
-            'retirado_por' => 'required|string|max:150',
-            'equipos'      => 'required|array|min:1',
-            'equipos.*'    => 'integer|exists:equipos,id',
+            'obra'                => 'required|string|max:150',
+            'retirado_por'        => 'required|string|max:150',
+            'equipos'             => 'required|array|min:1',
+            'equipos.*.id'        => 'integer|exists:equipos,id',
+            'equipos.*.cantidad'  => 'nullable|integer|min:1',
         ], [
             'obra.required'         => 'La obra es obligatoria.',
             'retirado_por.required' => 'El campo "retirado por" es obligatorio.',
@@ -41,16 +42,45 @@ class ControlEquipoController extends Controller
             'equipos.min'           => 'Debe agregar al menos un equipo a la lista.',
         ]);
 
-        $equiposPendientes = DetalleRetiro::whereIn('equipo_id', $request->equipos)
-            ->whereNull('fecha_devolucion')
-            ->pluck('equipo_id')
-            ->unique();
+        $equiposSolicitados = collect($request->equipos)->keyBy('id');
+        $equipos = Equipo::whereIn('id', $equiposSolicitados->keys())->get()->keyBy('id');
 
-        if ($equiposPendientes->isNotEmpty()) {
-            $nombres = Equipo::whereIn('id', $equiposPendientes)->pluck('abreviacion')->implode(', ');
+        $errores = [];
+
+        foreach ($equiposSolicitados as $equipoId => $item) {
+            $equipo = $equipos->get($equipoId);
+            if (! $equipo) {
+                continue;
+            }
+
+            $cantidadSolicitada = $item['cantidad'] ?? 1;
+
+            if ((int) $equipo->tipo_equipo_id === 2) {
+                $existencia = $equipo->inventarios()->sum('cantidad');
+                $retirado = DetalleRetiro::where('equipo_id', $equipoId)
+                    ->whereNull('fecha_devolucion')
+                    ->sum('cantidad_retirada');
+                $disponible = max(0, $existencia - $retirado);
+
+                if ($cantidadSolicitada > $disponible) {
+                    $errores[] = "{$equipo->abreviacion} (disponible: {$disponible})";
+                }
+            } else {
+                $tienePendiente = DetalleRetiro::where('equipo_id', $equipoId)
+                    ->whereNull('fecha_devolucion')
+                    ->exists();
+
+                if ($tienePendiente) {
+                    $errores[] = $equipo->abreviacion;
+                }
+            }
+        }
+
+        if (! empty($errores)) {
+            $nombres = implode(', ', $errores);
 
             throw ValidationException::withMessages([
-                'equipos' => "Los siguientes equipos ya tienen un retiro pendiente de devolución: {$nombres}",
+                'equipos' => "Los siguientes equipos no tienen disponibilidad suficiente o tienen un retiro pendiente de devolución: {$nombres}",
             ]);
         }
 
@@ -64,10 +94,11 @@ class ControlEquipoController extends Controller
             'fecha_retiro'          => now(),
         ]);
 
-        foreach ($request->equipos as $equipoId) {
+        foreach ($request->equipos as $equipo) {
             $retiro->detalles()->create([
-                'equipo_id'    => $equipoId,
-                'fecha_retiro' => now(),
+                'equipo_id'         => $equipo['id'],
+                'fecha_retiro'      => now(),
+                'cantidad_retirada' => $equipo['cantidad'] ?? 1,
             ]);
         }
 
@@ -84,14 +115,16 @@ class ControlEquipoController extends Controller
     public function storeDevolucion(Request $request): JsonResponse
     {
         $request->validate([
-            'detalles'   => 'required|array|min:1',
-            'detalles.*' => 'integer|exists:detalle_retiros,id',
+            'detalles'                     => 'required|array|min:1',
+            'detalles.*.detalle_retiro_id' => 'integer|exists:detalle_retiros,id',
+            'detalles.*.cantidad'          => 'integer|min:1',
         ], [
             'detalles.required' => 'Debe agregar al menos un equipo a la lista.',
             'detalles.min'      => 'Debe agregar al menos un equipo a la lista.',
         ]);
 
-        $detalles = DetalleRetiro::whereIn('id', $request->detalles)->get();
+        $items = collect($request->detalles)->keyBy('detalle_retiro_id');
+        $detalles = DetalleRetiro::whereIn('id', $items->keys())->get()->keyBy('id');
 
         if ($detalles->whereNotNull('fecha_devolucion')->isNotEmpty()) {
             throw ValidationException::withMessages([
@@ -99,7 +132,41 @@ class ControlEquipoController extends Controller
             ]);
         }
 
-        DetalleRetiro::whereIn('id', $request->detalles)->update(['fecha_devolucion' => now()]);
+        $errores = [];
+        foreach ($items as $detalleId => $item) {
+            $detalle = $detalles->get($detalleId);
+            if (! $detalle) {
+                continue;
+            }
+
+            $cantidadRetirada = $detalle->cantidad_retirada ?? 1;
+            $cantidadDevueltaActual = $detalle->cantidad_devuelta ?? 0;
+            $pendiente = $cantidadRetirada - $cantidadDevueltaActual;
+
+            if ($item['cantidad'] > $pendiente) {
+                $errores[] = "Detalle #{$detalle->id}: la cantidad supera lo pendiente de devolución ({$pendiente}).";
+            }
+        }
+
+        if (! empty($errores)) {
+            throw ValidationException::withMessages(['detalles' => implode(' ', $errores)]);
+        }
+
+        foreach ($items as $detalleId => $item) {
+            $detalle = $detalles->get($detalleId);
+            if (! $detalle) {
+                continue;
+            }
+
+            $cantidadRetirada = $detalle->cantidad_retirada ?? 1;
+            $nuevaCantidadDevuelta = ($detalle->cantidad_devuelta ?? 0) + $item['cantidad'];
+            $completo = $nuevaCantidadDevuelta >= $cantidadRetirada;
+
+            $detalle->update([
+                'cantidad_devuelta' => $nuevaCantidadDevuelta,
+                'fecha_devolucion'  => $completo ? now() : null,
+            ]);
+        }
 
         $retiroIds = $detalles->pluck('retiro_id')->unique();
         foreach (Retiro::whereIn('id', $retiroIds)->get() as $retiro) {

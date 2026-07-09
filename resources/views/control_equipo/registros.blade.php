@@ -132,8 +132,9 @@
             white-space: nowrap;
         }
         .badge svg { width: 12px; height: 12px; }
-        .badge-verde { background: #dcfce7; color: #15803d; }
-        .badge-rojo  { background: #fee2e2; color: #b91c1c; }
+        .badge-verde    { background: #dcfce7; color: #15803d; }
+        .badge-rojo     { background: #fee2e2; color: #b91c1c; }
+        .badge-amarillo { background: #fef3c7; color: #b45309; }
 
         .registro-detalles { display: flex; flex-direction: column; gap: 8px; }
         .detalle-equipo {
@@ -145,6 +146,7 @@
         .detalle-equipo-id { font-size: 11.5px; font-weight: 700; color: #9ca3af; flex-shrink: 0; }
         .detalle-equipo-nombre { font-size: 13.5px; font-weight: 600; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .detalle-equipo-marca { font-size: 12.5px; color: #9ca3af; flex-shrink: 0; }
+        .detalle-equipo-cantidad { font-size: 12px; font-weight: 600; color: #6b7280; flex-shrink: 0; }
 
         .empty-state {
             padding: 56px 24px;
@@ -266,12 +268,21 @@
             </div>
             <div class="registro-detalles">
                 @foreach($retiro->detalles as $detalle)
-                @php $detalleDevuelto = ! is_null($detalle->fecha_devolucion); @endphp
+                @php
+                    $detalleDevuelto = ! is_null($detalle->fecha_devolucion);
+                    $cantidadRetirada = $detalle->cantidad_retirada ?? 1;
+                    $cantidadDevuelta = $detalle->cantidad_devuelta ?? 0;
+                    $cantidadPendiente = max(0, $cantidadRetirada - $cantidadDevuelta);
+                    $esPorCantidad = (int) ($detalle->equipo->tipo_equipo_id ?? 0) === 2;
+                @endphp
                 <div class="detalle-equipo">
                     <div class="detalle-equipo-info">
                         <span class="detalle-equipo-id">{{ $detalle->equipo->abreviacion ?? '—' }}</span>
                         <span class="detalle-equipo-nombre">{{ $detalle->equipo->nombre ?? 'Equipo eliminado' }}</span>
                         <span class="detalle-equipo-marca">{{ $detalle->equipo->marca->descripcion ?? '' }}</span>
+                        @if($esPorCantidad)
+                        <span class="detalle-equipo-cantidad">Cant. {{ $cantidadDevuelta }}/{{ $cantidadRetirada }}</span>
+                        @endif
                     </div>
                     @if($detalleDevuelto)
                     <span class="badge badge-verde">
@@ -279,6 +290,13 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
                         </svg>
                         Devuelto {{ $detalle->fecha_devolucion?->format('d/m/Y') }}
+                    </span>
+                    @elseif($esPorCantidad && $cantidadDevuelta > 0)
+                    <span class="badge badge-amarillo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                        </svg>
+                        Parcial ({{ $cantidadPendiente }} pendiente)
                     </span>
                     @else
                     <span class="badge badge-rojo">

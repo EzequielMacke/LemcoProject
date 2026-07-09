@@ -20,18 +20,29 @@ class InventarioController extends Controller
 
         $detallesPendientes = DetalleRetiro::whereNull('fecha_devolucion')
             ->with(['retiro.obraRetiro', 'retiro.funcionarioRetiro'])
+            ->orderBy('fecha_retiro')
             ->get()
-            ->keyBy('equipo_id');
+            ->groupBy('equipo_id');
 
         $inventarios->each(function (Inventario $inventario) use ($detallesPendientes) {
-            $detalle = $detallesPendientes->get($inventario->equipo_id);
+            $detalles = $detallesPendientes->get($inventario->equipo_id, collect());
 
-            $inventario->cantidad_disponible = $detalle ? 0 : $inventario->cantidad;
-            $inventario->retiro_info = $detalle ? [
-                'obra'         => $detalle->retiro?->obraRetiro?->descripcion,
-                'retirado_por' => $detalle->retiro?->funcionarioRetiro?->descripcion,
-                'fecha_retiro' => optional($detalle->fecha_retiro)->format('d/m/Y'),
-            ] : null;
+            $retirosPendientes = $detalles->map(function (DetalleRetiro $detalle) {
+                $cantidadRetirada = $detalle->cantidad_retirada ?? 1;
+                $cantidadDevuelta = $detalle->cantidad_devuelta ?? 0;
+
+                return [
+                    'obra'               => $detalle->retiro?->obraRetiro?->descripcion,
+                    'retirado_por'       => $detalle->retiro?->funcionarioRetiro?->descripcion,
+                    'fecha_retiro'       => optional($detalle->fecha_retiro)->format('d/m/Y'),
+                    'cantidad_retirada'  => $cantidadRetirada,
+                    'cantidad_devuelta'  => $cantidadDevuelta,
+                    'cantidad_pendiente' => max(0, $cantidadRetirada - $cantidadDevuelta),
+                ];
+            })->values();
+
+            $inventario->cantidad_disponible = max(0, $inventario->cantidad - $retirosPendientes->sum('cantidad_pendiente'));
+            $inventario->retiros_pendientes = $retirosPendientes;
         });
 
         $marcas = Marca::orderBy('descripcion')->get();

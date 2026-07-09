@@ -336,6 +336,18 @@
             border-top: 1px dashed #f1f3f5;
         }
 
+        .tabs-bar {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            padding-bottom: 4px;
+        }
+        .tab-btn {
+            border: 1.5px solid #e9ecef; background: #fff; border-radius: 8px;
+            padding: 6px 10px; font-size: 12px; font-weight: 600; color: #6b7280;
+            cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s;
+        }
+        .tab-btn:hover { border-color: #e9d5ff; color: #9333ea; }
+        .tab-btn.active { background: #faf5ff; border-color: #9333ea; color: #9333ea; }
+
         .modal-foot {
             padding: 16px 22px;
             border-top: 1.5px solid #e9ecef;
@@ -526,7 +538,7 @@
                     <td class="td-cantidad {{ $inventario->cantidad_disponible == 0 ? 'td-no-disponible' : 'td-disponible' }}">
                         <div style="display: flex; align-items: center; gap: 6px;">
                             {{ $inventario->cantidad_disponible }}
-                            @if($inventario->cantidad_disponible == 0 && $inventario->retiro_info)
+                            @if($inventario->retiros_pendientes->isNotEmpty())
                             <button
                                 type="button"
                                 class="btn-icon-sm btn-icon-info"
@@ -537,9 +549,7 @@
                                 data-modelo="{{ $inventario->equipo->modelo ?? '—' }}"
                                 data-numero-serie="{{ $inventario->equipo->numero_serie ?? '—' }}"
                                 data-categoria="{{ $inventario->equipo->categoria->descripcion ?? '—' }}"
-                                data-obra="{{ $inventario->retiro_info['obra'] ?? '—' }}"
-                                data-retirado-por="{{ $inventario->retiro_info['retirado_por'] ?? '—' }}"
-                                data-fecha-retiro="{{ $inventario->retiro_info['fecha_retiro'] ?? '—' }}"
+                                data-retiros="{{ $inventario->retiros_pendientes->toJson() }}"
                                 onclick="abrirModalRetiroInfo(this)"
                             >
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -929,18 +939,23 @@
                 <span class="detalle-label">Categoría</span>
                 <span class="detalle-value" id="ri-categoria">—</span>
             </div>
-            <div class="modal-section-title">Datos del retiro</div>
+            <div class="modal-section-title">Retiros pendientes</div>
+            <div class="tabs-bar" id="ri-tabs"></div>
             <div class="detalle-row">
                 <span class="detalle-label">Obra</span>
-                <span class="detalle-value" id="ri-obra">—</span>
+                <span class="detalle-value" id="ri-tab-obra">—</span>
             </div>
             <div class="detalle-row">
                 <span class="detalle-label">Retirado por</span>
-                <span class="detalle-value" id="ri-retirado-por">—</span>
+                <span class="detalle-value" id="ri-tab-retirado-por">—</span>
             </div>
             <div class="detalle-row">
                 <span class="detalle-label">Fecha de retiro</span>
-                <span class="detalle-value" id="ri-fecha-retiro">—</span>
+                <span class="detalle-value" id="ri-tab-fecha-retiro">—</span>
+            </div>
+            <div class="detalle-row" id="ri-tab-cantidad-row" style="display: none;">
+                <span class="detalle-label">Cantidad</span>
+                <span class="detalle-value" id="ri-tab-cantidad">—</span>
             </div>
         </div>
         <div class="modal-foot">
@@ -1005,6 +1020,8 @@
         abrirModal('modal-eliminar');
     }
 
+    let riRetirosActuales = [];
+
     function abrirModalRetiroInfo(btn) {
         document.getElementById('ri-abreviacion').textContent = btn.dataset.abreviacion || '—';
         document.getElementById('ri-equipo').textContent = btn.dataset.equipo || '—';
@@ -1012,10 +1029,40 @@
         document.getElementById('ri-modelo').textContent = btn.dataset.modelo || '—';
         document.getElementById('ri-numero-serie').textContent = btn.dataset.numeroSerie || '—';
         document.getElementById('ri-categoria').textContent = btn.dataset.categoria || '—';
-        document.getElementById('ri-obra').textContent = btn.dataset.obra || '—';
-        document.getElementById('ri-retirado-por').textContent = btn.dataset.retiradoPor || '—';
-        document.getElementById('ri-fecha-retiro').textContent = btn.dataset.fechaRetiro || '—';
+
+        try { riRetirosActuales = JSON.parse(btn.dataset.retiros || '[]'); } catch (e) { riRetirosActuales = []; }
+
+        const cont = document.getElementById('ri-tabs');
+        cont.innerHTML = riRetirosActuales.map((r, idx) => `
+            <button type="button" class="tab-btn" data-idx="${idx}" onclick="seleccionarTabRetiroInfo(${idx})">
+                Retiro ${idx + 1}
+            </button>
+        `).join('');
+
+        if (riRetirosActuales.length > 0) seleccionarTabRetiroInfo(0);
+
         abrirModal('modal-retiro-info');
+    }
+
+    function seleccionarTabRetiroInfo(idx) {
+        const r = riRetirosActuales[idx];
+        if (!r) return;
+
+        document.querySelectorAll('#ri-tabs .tab-btn').forEach((btn) => {
+            btn.classList.toggle('active', Number(btn.dataset.idx) === idx);
+        });
+
+        document.getElementById('ri-tab-obra').textContent = r.obra || '—';
+        document.getElementById('ri-tab-retirado-por').textContent = r.retirado_por || '—';
+        document.getElementById('ri-tab-fecha-retiro').textContent = r.fecha_retiro || '—';
+
+        const cantidadRow = document.getElementById('ri-tab-cantidad-row');
+        if (r.cantidad_retirada !== 1) {
+            document.getElementById('ri-tab-cantidad').textContent = `${r.cantidad_devuelta}/${r.cantidad_retirada} (pendiente ${r.cantidad_pendiente})`;
+            cantidadRow.style.display = 'flex';
+        } else {
+            cantidadRow.style.display = 'none';
+        }
     }
 
     function actualizarCampoCantidad(modal = 'agregar') {

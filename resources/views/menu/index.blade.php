@@ -552,6 +552,7 @@
         </a>
         @endpermiso
 
+        @permiso('CVE')
         <a href="{{ route('control-equipos.index') }}" class="menu-card card-control-equipos">
             <div class="card-icon icon-control-equipos">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
@@ -572,6 +573,7 @@
                 </div>
             </div>
         </a>
+        @endpermiso
 
     </div>
 

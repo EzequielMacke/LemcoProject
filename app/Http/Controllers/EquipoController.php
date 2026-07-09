@@ -109,33 +109,74 @@ class EquipoController extends Controller
             return response()->json(['message' => 'No se encontró ningún equipo activo con ese código QR.'], 404);
         }
 
-        $ultimoDetalle = DetalleRetiro::where('equipo_id', $equipo->id)
-            ->with(['retiro.obraRetiro', 'retiro.funcionarioRetiro'])
-            ->latest('id')
-            ->first();
+        $esPorCantidad = (int) $equipo->tipo_equipo_id === 2;
 
         $retiroPendiente = null;
-        if ($ultimoDetalle && is_null($ultimoDetalle->fecha_devolucion)) {
-            $retiroPendiente = [
-                'detalle_retiro_id' => $ultimoDetalle->id,
-                'obra'              => $ultimoDetalle->retiro?->obraRetiro?->descripcion,
-                'retirado_por'      => $ultimoDetalle->retiro?->funcionarioRetiro?->descripcion,
-                'fecha_retiro'      => optional($ultimoDetalle->fecha_retiro)->format('d/m/Y'),
-            ];
+        if (! $esPorCantidad) {
+            $ultimoDetalle = DetalleRetiro::where('equipo_id', $equipo->id)
+                ->with(['retiro.obraRetiro', 'retiro.funcionarioRetiro'])
+                ->latest('id')
+                ->first();
+
+            if ($ultimoDetalle && is_null($ultimoDetalle->fecha_devolucion)) {
+                $retiroPendiente = [
+                    'detalle_retiro_id' => $ultimoDetalle->id,
+                    'obra'              => $ultimoDetalle->retiro?->obraRetiro?->descripcion,
+                    'retirado_por'      => $ultimoDetalle->retiro?->funcionarioRetiro?->descripcion,
+                    'fecha_retiro'      => optional($ultimoDetalle->fecha_retiro)->format('d/m/Y'),
+                ];
+            }
+        }
+
+        $cantidadDisponible = null;
+        $retirosPendientes = [];
+        if ($esPorCantidad) {
+            $existencia = $equipo->inventarios()->sum('cantidad');
+            $retirado = DetalleRetiro::where('equipo_id', $equipo->id)
+                ->whereNull('fecha_devolucion')
+                ->sum('cantidad_retirada');
+            $cantidadDisponible = max(0, $existencia - $retirado);
+
+            $detallesPendientes = DetalleRetiro::where('equipo_id', $equipo->id)
+                ->whereNull('fecha_devolucion')
+                ->with(['retiro.obraRetiro', 'retiro.funcionarioRetiro'])
+                ->orderBy('fecha_retiro')
+                ->get();
+
+            foreach ($detallesPendientes as $detalle) {
+                $cantidadRetirada = $detalle->cantidad_retirada ?? 1;
+                $cantidadDevuelta = $detalle->cantidad_devuelta ?? 0;
+                $cantidadPendiente = $cantidadRetirada - $cantidadDevuelta;
+
+                if ($cantidadPendiente > 0) {
+                    $retirosPendientes[] = [
+                        'detalle_retiro_id'  => $detalle->id,
+                        'obra'               => $detalle->retiro?->obraRetiro?->descripcion,
+                        'retirado_por'       => $detalle->retiro?->funcionarioRetiro?->descripcion,
+                        'fecha_retiro'       => optional($detalle->fecha_retiro)->format('d/m/Y'),
+                        'cantidad_retirada'  => $cantidadRetirada,
+                        'cantidad_devuelta'  => $cantidadDevuelta,
+                        'cantidad_pendiente' => $cantidadPendiente,
+                    ];
+                }
+            }
         }
 
         return response()->json([
-            'id'               => $equipo->id,
-            'nombre'           => $equipo->nombre,
-            'abreviacion'      => $equipo->abreviacion,
-            'marca'            => $equipo->marca->descripcion ?? null,
-            'modelo'           => $equipo->modelo,
-            'numero_serie'     => $equipo->numero_serie,
-            'categoria'        => $equipo->categoria->descripcion ?? null,
-            'tipo_equipo'      => $equipo->tipoEquipo->descripcion ?? null,
-            'observacion'      => $equipo->observacion,
-            'codigo_qr'        => $equipo->codigo_qr,
-            'retiro_pendiente' => $retiroPendiente,
+            'id'                  => $equipo->id,
+            'nombre'              => $equipo->nombre,
+            'abreviacion'         => $equipo->abreviacion,
+            'marca'               => $equipo->marca->descripcion ?? null,
+            'modelo'              => $equipo->modelo,
+            'numero_serie'        => $equipo->numero_serie,
+            'categoria'           => $equipo->categoria->descripcion ?? null,
+            'tipo_equipo_id'      => $equipo->tipo_equipo_id,
+            'tipo_equipo'         => $equipo->tipoEquipo->descripcion ?? null,
+            'observacion'         => $equipo->observacion,
+            'codigo_qr'           => $equipo->codigo_qr,
+            'retiro_pendiente'    => $retiroPendiente,
+            'cantidad_disponible' => $cantidadDisponible,
+            'retiros_pendientes'  => $retirosPendientes,
         ]);
     }
 

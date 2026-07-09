@@ -44,13 +44,17 @@ Route::middleware(Autenticado::class)->group(function () {
         return view('menu.index', compact('datosFaltantes'));
     })->name('menu.index');
 
-    Route::get('/control-equipos',        [ControlEquipoController::class, 'index'])->name('control-equipos.index');
-    Route::get('/control-equipos/retiro', [ControlEquipoController::class, 'retiro'])->name('control-equipos.retiro');
-    Route::post('/control-equipos/retiro', [ControlEquipoController::class, 'storeRetiro'])->name('control-equipos.retiro.store');
-    Route::get('/control-equipos/devolucion', [ControlEquipoController::class, 'devolucion'])->name('control-equipos.devolucion');
-    Route::post('/control-equipos/devolucion', [ControlEquipoController::class, 'storeDevolucion'])->name('control-equipos.devolucion.store');
-    Route::get('/control-equipos/registros', [ControlEquipoController::class, 'registros'])->name('control-equipos.registros');
-    Route::get('/equipos/qr/{codigo}',    [EquipoController::class, 'buscarPorQr'])->name('equipos.buscar-por-qr');
+    Route::middleware('permiso:CVE')->group(function () {
+        Route::get('/control-equipos',           [ControlEquipoController::class, 'index'])->name('control-equipos.index');
+        Route::get('/control-equipos/registros', [ControlEquipoController::class, 'registros'])->name('control-equipos.registros');
+    });
+    Route::middleware('permiso:CVE,agregar')->group(function () {
+        Route::get('/control-equipos/retiro', [ControlEquipoController::class, 'retiro'])->name('control-equipos.retiro');
+        Route::post('/control-equipos/retiro', [ControlEquipoController::class, 'storeRetiro'])->name('control-equipos.retiro.store');
+        Route::get('/control-equipos/devolucion', [ControlEquipoController::class, 'devolucion'])->name('control-equipos.devolucion');
+        Route::post('/control-equipos/devolucion', [ControlEquipoController::class, 'storeDevolucion'])->name('control-equipos.devolucion.store');
+        Route::get('/equipos/qr/{codigo}', [EquipoController::class, 'buscarPorQr'])->name('equipos.buscar-por-qr');
+    });
 
     Route::middleware('permiso:DAT')->group(function () {
         Route::get('/personas', [PersonaController::class, 'index'])->name('personas.index');

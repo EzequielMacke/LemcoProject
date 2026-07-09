@@ -229,6 +229,7 @@
 
     {{-- Acciones --}}
     <div class="acciones-grid">
+        @permiso('CVE', 'agregar')
         <a href="{{ route('control-equipos.retiro') }}" class="accion-card card-retiro">
             <div class="accion-icon icon-retiro">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
@@ -268,6 +269,7 @@
                 </div>
             </div>
         </a>
+        @endpermiso
     </div>
 
 </main>

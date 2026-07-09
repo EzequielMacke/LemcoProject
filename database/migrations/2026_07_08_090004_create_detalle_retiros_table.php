@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('equipo_id')->constrained('equipos');
             $table->date('fecha_retiro');
             $table->date('fecha_devolucion')->nullable();
+            $table->integer('cantidad_retirada')->nullable();
+            $table->integer('cantidad_devuelta')->nullable();
             $table->timestamps();
         });
     }
