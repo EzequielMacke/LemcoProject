@@ -361,11 +361,47 @@
         }
 
         /* ── Responsive ── */
-        @media (max-width: 600px) {
+        @media (max-width: 780px) {
             .page { padding: 20px 16px 32px; }
-            .td-id, .th-id { display: none; }
             .toolbar { flex-direction: column; align-items: stretch; }
             .search-wrap { max-width: 100%; }
+
+            /* Tabla → tarjetas verticales */
+            .table-scroll { overflow-x: visible; }
+            table { min-width: 0; }
+            thead { display: none; }
+            table, tbody, tr, td { display: block; width: 100%; }
+
+            tbody { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+            tr.fila-inventario {
+                border: 1.5px solid #e9ecef; border-radius: 14px;
+                padding: 4px 14px; border-bottom: 1.5px solid #e9ecef;
+            }
+            tr.fila-inventario:hover { background: #fff; }
+
+            tbody td {
+                display: flex; align-items: center; justify-content: space-between; gap: 14px;
+                padding: 9px 0; border-bottom: 1px dashed #f1f3f5;
+                white-space: normal; overflow: visible; text-align: right;
+            }
+            tr.fila-inventario td:last-child { border-bottom: none; }
+            tbody td::before {
+                content: attr(data-label);
+                font-size: 11px; font-weight: 700; color: #9ca3af;
+                text-transform: uppercase; letter-spacing: 0.5px;
+                text-align: left; flex-shrink: 0;
+            }
+
+            .td-desc { align-items: flex-start; flex-direction: column; justify-content: flex-start; gap: 4px; }
+            .td-desc .equipo-nombre, .td-desc .equipo-obs { white-space: normal; text-align: left; }
+
+            .td-actions { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 8px; padding-top: 12px; }
+            .td-actions::before { content: none; }
+            .td-actions-inner { justify-content: flex-end; }
+
+            #fila-sin-resultados { display: block; }
+            #fila-sin-resultados td { display: block; text-align: center; }
+            #fila-sin-resultados td::before { content: none; }
         }
     </style>
 </head>
@@ -522,20 +558,20 @@
                     ));
                 @endphp
                 <tr class="fila-inventario" data-buscar="{{ $buscar }}" data-disponible="{{ $inventario->cantidad_disponible }}">
-                    <td class="td-id">{{ $inventario->id }}</td>
-                    <td class="td-muted">{{ $inventario->equipo->abreviacion ?? '—' }}</td>
-                    <td class="td-desc">
+                    <td class="td-id" data-label="#">{{ $inventario->id }}</td>
+                    <td class="td-muted" data-label="Identificación">{{ $inventario->equipo->abreviacion ?? '—' }}</td>
+                    <td class="td-desc" data-label="Equipo">
                         <div class="equipo-nombre">{{ $inventario->equipo->nombre ?? '—' }}</div>
                         @if(!empty($inventario->equipo->observacion))
                         <div class="equipo-obs" title="{{ $inventario->equipo->observacion }}">{{ $inventario->equipo->observacion }}</div>
                         @endif
                     </td>
-                    <td>{{ $inventario->equipo->marca->descripcion ?? '—' }}</td>
-                    <td>{{ $inventario->equipo->modelo ?? '—' }}</td>
-                    <td class="td-muted">{{ $inventario->equipo->numero_serie ?? '—' }}</td>
-                    <td>{{ $inventario->equipo->categoria->descripcion ?? '—' }}</td>
-                    <td class="td-cantidad">{{ $inventario->cantidad }}</td>
-                    <td class="td-cantidad {{ $inventario->cantidad_disponible == 0 ? 'td-no-disponible' : 'td-disponible' }}">
+                    <td data-label="Marca">{{ $inventario->equipo->marca->descripcion ?? '—' }}</td>
+                    <td data-label="Modelo">{{ $inventario->equipo->modelo ?? '—' }}</td>
+                    <td class="td-muted" data-label="N° Serie">{{ $inventario->equipo->numero_serie ?? '—' }}</td>
+                    <td data-label="Categoría">{{ $inventario->equipo->categoria->descripcion ?? '—' }}</td>
+                    <td class="td-cantidad" data-label="Cant. Existente">{{ $inventario->cantidad }}</td>
+                    <td class="td-cantidad {{ $inventario->cantidad_disponible == 0 ? 'td-no-disponible' : 'td-disponible' }}" data-label="Cant. Disponible">
                         <div style="display: flex; align-items: center; gap: 6px;">
                             {{ $inventario->cantidad_disponible }}
                             @if($inventario->retiros_pendientes->isNotEmpty())
