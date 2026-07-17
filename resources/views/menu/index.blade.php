@@ -133,6 +133,7 @@
         .menu-card:nth-child(8) { animation-delay: 0.48s; }
         .menu-card:nth-child(9) { animation-delay: 0.54s; }
         .menu-card:nth-child(10) { animation-delay: 0.60s; }
+        .menu-card:nth-child(11) { animation-delay: 0.66s; }
 
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(12px); }
@@ -165,6 +166,7 @@
         .card-buscador::before { background: #0d9488; }
         .card-inventario::before { background: #9333ea; }
         .card-control-equipos::before { background: #0284c7; }
+        .card-reporte::before { background: #16a34a; }
 
         /* Ícono */
         .card-icon {
@@ -187,6 +189,7 @@
         .icon-buscador  { background: #f0fdfa; color: #0d9488; }
         .icon-inventario { background: #faf5ff; color: #9333ea; }
         .icon-control-equipos { background: #f0f9ff; color: #0284c7; }
+        .icon-reporte { background: #f0fdf4; color: #16a34a; }
 
         /* Texto — crece para llenar el espacio */
         .card-body { flex: 1; min-height: 0; }
@@ -563,6 +566,28 @@
             <div class="card-body">
                 <div class="card-label">Control de Equipos</div>
                 <div class="card-desc">Seguimiento y control de equipos</div>
+            </div>
+            <div class="card-foot">
+                <span class="card-foot-label">Módulo</span>
+                <div class="card-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+        @endpermiso
+
+        @permiso('REP')
+        <a href="{{ route('reporte.index') }}" class="menu-card card-reporte">
+            <div class="card-icon icon-reporte">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15.75h3.75M9 8.25h3.75M6.75 21h10.5a2.25 2.25 0 002.25-2.25V6.621a2.25 2.25 0 00-.659-1.591l-2.121-2.121A2.25 2.25 0 0015.129 2.25H6.75A2.25 2.25 0 004.5 4.5v14.25A2.25 2.25 0 006.75 21z"/>
+                </svg>
+            </div>
+            <div class="card-body">
+                <div class="card-label">Reporte</div>
+                <div class="card-desc">Generador de reportes gerenciales</div>
             </div>
             <div class="card-foot">
                 <span class="card-foot-label">Módulo</span>

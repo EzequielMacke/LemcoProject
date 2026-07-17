@@ -33,6 +33,8 @@ class AdminSeeder extends Seeder
             ['descripcion' => 'Buscador',                   'abreviacion' => 'BUS'],
             ['descripcion' => 'Inventario',                 'abreviacion' => 'INV'],
             ['descripcion' => 'Control de Equipos',         'abreviacion' => 'CVE'],
+            ['descripcion' => 'Reportes',                   'abreviacion' => 'REP'],
+            ['descripcion' => 'Reporte de Certificación',   'abreviacion' => 'REC'],
         ];
 
         foreach ($modulos as $data) {

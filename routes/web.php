@@ -15,6 +15,7 @@ use App\Http\Controllers\ObraExcelController;
 use App\Http\Controllers\PendienteController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Middleware\Autenticado;
 use App\Models\Persona;
@@ -43,6 +44,15 @@ Route::middleware(Autenticado::class)->group(function () {
         $datosFaltantes = collect($campos)->filter(fn($c) => blank($persona?->$c))->count();
         return view('menu.index', compact('datosFaltantes'));
     })->name('menu.index');
+
+    Route::middleware('permiso:REP')->group(function () {
+        Route::get('/reportes', [ReporteController::class, 'index'])->name('reporte.index');
+    });
+
+    Route::middleware('permiso:REC')->group(function () {
+        Route::get('/reportes/certificado', [ReporteController::class, 'certificadoParametros'])->name('reporte.certificado.parametros');
+        Route::get('/reportes/certificado/pdf', [ReporteController::class, 'certificadoPdf'])->name('reporte.certificado.pdf');
+    });
 
     Route::middleware('permiso:CVE')->group(function () {
         Route::get('/control-equipos',           [ControlEquipoController::class, 'index'])->name('control-equipos.index');

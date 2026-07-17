@@ -362,13 +362,13 @@
                         <td class="td-mono">{{ $row['seccion'] !== null ? number_format($row['seccion'], 2) : '—' }}</td>
                         <td class="td-mono">{{ $row['altura'] !== null ? number_format($row['altura'], 2) : '—' }}</td>
                         <td class="td-mono">{{ $row['dProm'] !== null ? number_format($row['dProm'], 2) : '—' }}</td>
-                        <td class="td-mono">{{ $row['tension'] !== null ? number_format($row['tension'], 2) : '—' }}</td>
+                        <td class="td-mono">{{ $row['tension'] !== null ? number_format($row['tension'], 1) : '—' }}</td>
                         <td class="td-mono">{{ $row['hd'] !== null ? number_format($row['hd'], 2) : '—' }}</td>
                         <td class="td-mono">{{ $row['chd'] !== null ? number_format($row['chd'], 4) : '—' }}</td>
-                        <td class="td-mono">{{ $row['tensionCorregida'] !== null ? number_format($row['tensionCorregida'], 2) : '—' }}</td>
+                        <td class="td-mono">{{ $row['tensionCorregida'] !== null ? number_format($row['tensionCorregida'], 1) : '—' }}</td>
                         @if($row['rowspan'] > 0)
                         <td class="td-mono" rowspan="{{ $row['rowspan'] }}" style="vertical-align:middle; text-align:center; background:#f8fafc; font-weight:600;">
-                            {{ $row['tensionPromedio'] !== null ? number_format($row['tensionPromedio'], 2) : '—' }}
+                            {{ $row['tensionPromedio'] !== null ? number_format($row['tensionPromedio'], 1) : '—' }}
                         </td>
                         @endif
                         <td class="td-mono">{{ $p->tipo_rotura ?? '—' }}</td>

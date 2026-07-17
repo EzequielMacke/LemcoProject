@@ -13,13 +13,13 @@ class PermisoController extends Controller
 {
     public function index(): View
     {
-        $areas = Area::orderBy('descripcion')->get();
+        $areas = Area::orderBy('id')->get();
         return view('permisos.index', compact('areas'));
     }
 
     public function edit(Area $area): View
     {
-        $modulos  = Modulo::orderBy('descripcion')->get();
+        $modulos  = Modulo::orderBy('id')->get();
         $permisos = Permiso::where('area_id', $area->id)
             ->get()
             ->keyBy('modulo_id');

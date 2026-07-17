@@ -298,13 +298,13 @@
             <td>{{ $row['seccion'] !== null ? number_format($row['seccion'], 2) : '—' }}</td>
             <td>{{ $row['altura'] !== null ? number_format($row['altura'], 2) : '—' }}</td>
             <td>{{ $row['dProm'] !== null ? number_format($row['dProm'], 2) : '—' }}</td>
-            <td>{{ $row['tension'] !== null ? number_format($row['tension'], 2) : '—' }}</td>
+            <td>{{ $row['tension'] !== null ? number_format($row['tension'], 1) : '—' }}</td>
             <td>{{ $row['hd'] !== null ? number_format($row['hd'], 2) : '—' }}</td>
             <td>{{ $row['chd'] !== null ? number_format($row['chd'], 4) : '—' }}</td>
-            <td>{{ $row['tensionCorregida'] !== null ? number_format($row['tensionCorregida'], 2) : '—' }}</td>
+            <td>{{ $row['tensionCorregida'] !== null ? number_format($row['tensionCorregida'], 1) : '—' }}</td>
             @if($row['rowspan'] > 0)
             <td class="td-avg" rowspan="{{ $row['rowspan'] }}">
-                {{ $row['tensionPromedio'] !== null ? number_format($row['tensionPromedio'], 2) : '—' }}
+                {{ $row['tensionPromedio'] !== null ? number_format($row['tensionPromedio'], 1) : '—' }}
             </td>
             @endif
             <td>{{ $p->tipo_rotura ?? '—' }}</td>
