@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Buscador general — LemcoProject</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -114,6 +115,19 @@
 
         .btn-ver { text-decoration: none; }
 
+        /* ── Edición inline ── */
+        td.editable-cell { cursor: text; }
+        td.editable-cell:hover { background: #f0fdfa !important; box-shadow: inset 0 0 0 1.5px #99f6e4; }
+        td.editable-cell.editing { padding: 5px 7px; background: #fff !important; }
+        .cell-edit-input {
+            width: 100%; border: 1.5px solid #0d9488; border-radius: 6px;
+            padding: 3px 6px; font-size: 12.5px; color: #111827;
+            font-family: 'Inter', sans-serif; outline: none;
+            box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+        }
+        select.cell-edit-input { cursor: pointer; }
+        td.cell-saving { opacity: 0.55; }
+
         /* ── Badges ── */
         .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
         .badge-ok      { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
@@ -164,28 +178,30 @@
     </div>
 
     @php
+        $puedeEditar = session('permisos', [])['bus']['editar'] ?? false;
+
         $columnas = [
-            ['key' => 'nombre',              'label' => 'Nombre',           'type' => 'text',   'width' => 110],
+            ['key' => 'nombre',              'label' => 'Nombre',           'type' => 'text',   'width' => 110, 'edit' => ['type' => 'text']],
             ['key' => 'obra',                'label' => 'Obra',             'type' => 'text',   'width' => 170],
             ['key' => 'remision',            'label' => 'Remisión',         'type' => 'text',   'width' => 100],
-            ['key' => 'mixer',               'label' => 'Mixer',            'type' => 'text',   'width' => 90],
-            ['key' => 'concretera',          'label' => 'Concretera',       'type' => 'text',   'width' => 130],
-            ['key' => 'fck',                 'label' => "F'ck",             'type' => 'text',   'width' => 75],
-            ['key' => 'elemento',            'label' => 'Elemento',         'type' => 'text',   'width' => 120],
-            ['key' => 'fecha_moldeo',        'label' => 'Fecha moldeo',     'type' => 'date',   'width' => 130],
-            ['key' => 'hora_moldeo',         'label' => 'Hora moldeo',      'type' => 'text',   'width' => 100],
-            ['key' => 'edad_ensayo',         'label' => 'Edad ensayo',      'type' => 'text',   'width' => 100],
+            ['key' => 'mixer',               'label' => 'Mixer',            'type' => 'text',   'width' => 90,  'edit' => ['type' => 'text']],
+            ['key' => 'concretera',          'label' => 'Concretera',       'type' => 'text',   'width' => 130, 'edit' => ['type' => 'text']],
+            ['key' => 'fck',                 'label' => "F'ck",             'type' => 'text',   'width' => 75,  'edit' => ['type' => 'number', 'step' => '1']],
+            ['key' => 'elemento',            'label' => 'Elemento',         'type' => 'text',   'width' => 120, 'edit' => ['type' => 'text']],
+            ['key' => 'fecha_moldeo',        'label' => 'Fecha moldeo',     'type' => 'date',   'width' => 130, 'edit' => ['type' => 'date']],
+            ['key' => 'hora_moldeo',         'label' => 'Hora moldeo',      'type' => 'text',   'width' => 100, 'edit' => ['type' => 'time']],
+            ['key' => 'edad_ensayo',         'label' => 'Edad ensayo',      'type' => 'text',   'width' => 100, 'edit' => ['type' => 'number', 'step' => '1']],
             ['key' => 'fecha_programada',    'label' => 'Fecha programada', 'type' => 'date',   'width' => 135],
-            ['key' => 'defecto',             'label' => 'Defecto',          'type' => 'text',   'width' => 110],
-            ['key' => 'carga_rotura',        'label' => 'Carga rotura',     'type' => 'text',   'width' => 110],
-            ['key' => 'tipo_rotura',         'label' => 'Tipo rotura',      'type' => 'select', 'width' => 100, 'options' => [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6]],
-            ['key' => 'diametro_superior_1', 'label' => 'Ø sup. 1',         'type' => 'text',   'width' => 90],
-            ['key' => 'diametro_superior_2', 'label' => 'Ø sup. 2',         'type' => 'text',   'width' => 90],
-            ['key' => 'diametro_inferior_1', 'label' => 'Ø inf. 1',         'type' => 'text',   'width' => 90],
-            ['key' => 'diametro_inferior_2', 'label' => 'Ø inf. 2',         'type' => 'text',   'width' => 90],
-            ['key' => 'altura_1',            'label' => 'Alt. 1',           'type' => 'text',   'width' => 85],
-            ['key' => 'altura_2',            'label' => 'Alt. 2',           'type' => 'text',   'width' => 85],
-            ['key' => 'altura_3',            'label' => 'Alt. 3',           'type' => 'text',   'width' => 85],
+            ['key' => 'defecto',             'label' => 'Defecto',          'type' => 'text',   'width' => 110, 'edit' => ['type' => 'text']],
+            ['key' => 'carga_rotura',        'label' => 'Carga rotura',     'type' => 'text',   'width' => 110, 'edit' => ['type' => 'number', 'step' => '0.01']],
+            ['key' => 'tipo_rotura',         'label' => 'Tipo rotura',      'type' => 'select', 'width' => 100, 'options' => [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6], 'edit' => ['type' => 'select', 'options' => [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6]]],
+            ['key' => 'diametro_superior_1', 'label' => 'Ø sup. 1',         'type' => 'text',   'width' => 90, 'edit' => ['type' => 'number', 'step' => '0.01']],
+            ['key' => 'diametro_superior_2', 'label' => 'Ø sup. 2',         'type' => 'text',   'width' => 90, 'edit' => ['type' => 'number', 'step' => '0.01']],
+            ['key' => 'diametro_inferior_1', 'label' => 'Ø inf. 1',         'type' => 'text',   'width' => 90, 'edit' => ['type' => 'number', 'step' => '0.01']],
+            ['key' => 'diametro_inferior_2', 'label' => 'Ø inf. 2',         'type' => 'text',   'width' => 90, 'edit' => ['type' => 'number', 'step' => '0.01']],
+            ['key' => 'altura_1',            'label' => 'Alt. 1',           'type' => 'text',   'width' => 85, 'edit' => ['type' => 'number', 'step' => '0.01']],
+            ['key' => 'altura_2',            'label' => 'Alt. 2',           'type' => 'text',   'width' => 85, 'edit' => ['type' => 'number', 'step' => '0.01']],
+            ['key' => 'altura_3',            'label' => 'Alt. 3',           'type' => 'text',   'width' => 85, 'edit' => ['type' => 'number', 'step' => '0.01']],
             ['key' => 'ensayado_por',        'label' => 'Ensayado por',     'type' => 'text',   'width' => 160],
             ['key' => 'estado_ensayo',       'label' => 'Estado',           'type' => 'select', 'width' => 115, 'options' => ['ensayada' => 'Ensayada', 'pendiente' => 'Pendiente']],
             ['key' => 'informe',             'label' => 'Informe',          'type' => 'select', 'width' => 115, 'options' => ['con_informe' => 'En informe', 'sin_informe' => 'Sin informe']],
@@ -250,31 +266,37 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @php
+                        $celdaClase = fn ($extra = '') => trim(($puedeEditar ? 'editable-cell ' : '').$extra);
+                        $celdaAttrs = fn ($key, $type, $raw) => $puedeEditar
+                            ? sprintf(' data-field="%s" data-type="%s" data-raw="%s"', $key, $type, e($raw))
+                            : '';
+                    @endphp
                     @forelse($resultados as $p)
-                    <tr>
-                        <td class="cell-strong">{{ $p->nombre }}</td>
+                    <tr data-probeta-id="{{ $p->id }}">
+                        <td class="{{ $celdaClase('cell-strong') }}"{!! $celdaAttrs('nombre', 'text', $p->nombre) !!}><span class="cell-value">{{ $p->nombre }}</span></td>
                         <td>{{ $p->obra_nombre }}</td>
                         <td>{{ $p->remision_nro }}</td>
-                        <td>{{ $p->mixer }}</td>
-                        <td>{{ $p->concretera }}</td>
-                        <td>{{ $p->fck }}</td>
-                        <td>{{ $p->elemento }}</td>
-                        <td>{{ $p->fecha_moldeo?->format('d/m/Y') ?? '—' }}</td>
-                        <td>{{ $p->hora_moldeo ? substr($p->hora_moldeo, 0, 5) : '—' }}</td>
-                        <td>{{ $p->edad_ensayo !== null ? $p->edad_ensayo.' días' : '—' }}</td>
-                        <td class="cell-muted">{{ $p->fecha_programada ? \Carbon\Carbon::parse($p->fecha_programada)->format('d/m/Y') : '—' }}</td>
-                        <td>{{ $p->defecto ?? '—' }}</td>
-                        <td>{{ $p->carga_rotura !== null ? number_format($p->carga_rotura, 2) : '—' }}</td>
-                        <td>{{ $p->tipo_rotura ?? '—' }}</td>
-                        <td>{{ $p->diametro_superior_1 ?? '—' }}</td>
-                        <td>{{ $p->diametro_superior_2 ?? '—' }}</td>
-                        <td>{{ $p->diametro_inferior_1 ?? '—' }}</td>
-                        <td>{{ $p->diametro_inferior_2 ?? '—' }}</td>
-                        <td>{{ $p->altura_1 ?? '—' }}</td>
-                        <td>{{ $p->altura_2 ?? '—' }}</td>
-                        <td>{{ $p->altura_3 ?? '—' }}</td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('mixer', 'text', $p->mixer) !!}><span class="cell-value">{{ $p->mixer }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('concretera', 'text', $p->concretera) !!}><span class="cell-value">{{ $p->concretera }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('fck', 'number', $p->fck) !!}><span class="cell-value">{{ $p->fck }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('elemento', 'text', $p->elemento) !!}><span class="cell-value">{{ $p->elemento }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('fecha_moldeo', 'date', $p->fecha_moldeo?->format('Y-m-d')) !!}><span class="cell-value">{{ $p->fecha_moldeo?->format('d/m/Y') ?? '—' }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('hora_moldeo', 'time', $p->hora_moldeo ? substr($p->hora_moldeo, 0, 5) : '') !!}><span class="cell-value">{{ $p->hora_moldeo ? substr($p->hora_moldeo, 0, 5) : '—' }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('edad_ensayo', 'number', $p->edad_ensayo) !!}><span class="cell-value">{{ $p->edad_ensayo !== null ? $p->edad_ensayo.' días' : '—' }}</span></td>
+                        <td class="cell-muted" data-col="fecha_programada"><span class="cell-value">{{ $p->fecha_programada ? \Carbon\Carbon::parse($p->fecha_programada)->format('d/m/Y') : '—' }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('defecto', 'text', $p->defecto) !!}><span class="cell-value">{{ $p->defecto ?? '—' }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('carga_rotura', 'number', $p->carga_rotura) !!}><span class="cell-value">{{ $p->carga_rotura !== null ? number_format($p->carga_rotura, 2) : '—' }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('tipo_rotura', 'select', $p->tipo_rotura) !!}><span class="cell-value">{{ $p->tipo_rotura ?? '—' }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('diametro_superior_1', 'number', $p->diametro_superior_1) !!}><span class="cell-value">{{ $p->diametro_superior_1 ?? '—' }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('diametro_superior_2', 'number', $p->diametro_superior_2) !!}><span class="cell-value">{{ $p->diametro_superior_2 ?? '—' }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('diametro_inferior_1', 'number', $p->diametro_inferior_1) !!}><span class="cell-value">{{ $p->diametro_inferior_1 ?? '—' }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('diametro_inferior_2', 'number', $p->diametro_inferior_2) !!}><span class="cell-value">{{ $p->diametro_inferior_2 ?? '—' }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('altura_1', 'number', $p->altura_1) !!}><span class="cell-value">{{ $p->altura_1 ?? '—' }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('altura_2', 'number', $p->altura_2) !!}><span class="cell-value">{{ $p->altura_2 ?? '—' }}</span></td>
+                        <td class="{{ $celdaClase() }}"{!! $celdaAttrs('altura_3', 'number', $p->altura_3) !!}><span class="cell-value">{{ $p->altura_3 ?? '—' }}</span></td>
                         <td>{{ $p->ensayado_por_nombre ?? '—' }}</td>
-                        <td>
+                        <td data-col="estado_ensayo">
                             @if($p->es_ensayada == 1)
                                 <span class="badge badge-ok">Ensayada</span>
                             @else
@@ -372,6 +394,123 @@
             wrap.scrollTop = scrollTop - (e.pageY - startY);
         });
     })();
+
+    @if($puedeEditar)
+    (function () {
+        const tbody = document.querySelector('.results-table tbody');
+        if (!tbody) return;
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const updateUrlTemplate = "{{ route('buscador.probetas.update', ['probeta' => '__ID__']) }}";
+        const SELECT_OPTIONS = { tipo_rotura: [1, 2, 3, 4, 5, 6] };
+        const STEP_1 = ['fck', 'edad_ensayo'];
+
+        tbody.addEventListener('dblclick', (e) => {
+            const td = e.target.closest('td[data-field]');
+            if (!td || td.classList.contains('editing')) return;
+            empezarEdicion(td);
+        });
+
+        function empezarEdicion(td) {
+            const tipo = td.dataset.type;
+            const campo = td.dataset.field;
+            const raw = td.dataset.raw || '';
+            const textoOriginal = td.querySelector('.cell-value').textContent;
+
+            td.classList.add('editing');
+            td.innerHTML = '';
+
+            let input;
+            if (tipo === 'select') {
+                input = document.createElement('select');
+                const opciones = SELECT_OPTIONS[campo] || [];
+                input.innerHTML = '<option value="">—</option>'
+                    + opciones.map((o) => `<option value="${o}">${o}</option>`).join('');
+            } else {
+                input = document.createElement('input');
+                input.type = tipo;
+                if (tipo === 'number') input.step = STEP_1.includes(campo) ? '1' : '0.01';
+            }
+            input.className = 'cell-edit-input';
+            input.value = raw;
+
+            td.appendChild(input);
+            input.focus();
+            if (input.select) input.select();
+
+            let cancelado = false;
+
+            input.addEventListener('keydown', (ev) => {
+                if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
+                else if (ev.key === 'Escape') { cancelado = true; input.blur(); }
+            });
+
+            input.addEventListener('blur', () => {
+                if (cancelado || input.value === raw) {
+                    finalizarEdicion(td, textoOriginal, raw);
+                    return;
+                }
+                guardar(td, input.value, textoOriginal, raw);
+            });
+        }
+
+        function finalizarEdicion(td, textoMostrado, raw) {
+            td.classList.remove('editing');
+            td.dataset.raw = raw;
+            td.innerHTML = '';
+            const span = document.createElement('span');
+            span.className = 'cell-value';
+            span.textContent = textoMostrado;
+            td.appendChild(span);
+        }
+
+        function guardar(td, nuevoValor, textoOriginal, rawOriginal) {
+            const tr = td.closest('tr');
+            const probetaId = tr.dataset.probetaId;
+            const campo = td.dataset.field;
+
+            td.classList.add('cell-saving');
+
+            fetch(updateUrlTemplate.replace('__ID__', probetaId), {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify({ campo, valor: nuevoValor }),
+            })
+                .then(async (res) => {
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) {
+                        const primerError = data.errors ? Object.values(data.errors)[0]?.[0] : null;
+                        throw new Error(primerError || data.message || 'No se pudo guardar el cambio.');
+                    }
+                    return data;
+                })
+                .then((data) => {
+                    finalizarEdicion(td, data.valor, nuevoValor);
+
+                    const fpTd = tr.querySelector('[data-col="fecha_programada"] .cell-value');
+                    if (fpTd) fpTd.textContent = data.fecha_programada;
+
+                    const estadoTd = tr.querySelector('[data-col="estado_ensayo"]');
+                    if (estadoTd) {
+                        estadoTd.innerHTML = data.es_ensayada
+                            ? '<span class="badge badge-ok">Ensayada</span>'
+                            : '<span class="badge badge-pend">Pendiente</span>';
+                    }
+                })
+                .catch((err) => {
+                    alert(err.message);
+                    finalizarEdicion(td, textoOriginal, rawOriginal);
+                })
+                .finally(() => {
+                    td.classList.remove('cell-saving');
+                });
+        }
+    })();
+    @endif
 </script>
 
 </body>

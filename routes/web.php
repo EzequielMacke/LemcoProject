@@ -204,6 +204,9 @@ Route::middleware(Autenticado::class)->group(function () {
     Route::middleware('permiso:BUS')->group(function () {
         Route::get('/buscador', [BuscadorController::class, 'index'])->name('buscador.index');
     });
+    Route::middleware('permiso:BUS,editar')->group(function () {
+        Route::patch('/buscador/probetas/{probeta}', [BuscadorController::class, 'update'])->name('buscador.probetas.update');
+    });
 
     Route::middleware('permiso:INV')->group(function () {
         Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario.index');

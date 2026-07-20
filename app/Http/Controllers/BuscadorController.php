@@ -4,11 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Models\Probeta;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BuscadorController extends Controller
 {
+    /** Reglas de validación por campo editable inline desde la tabla del buscador. */
+    private const REGLAS_EDICION = [
+        'nombre'              => ['required', 'string', 'max:255'],
+        'mixer'               => ['required', 'string', 'max:255'],
+        'concretera'          => ['required', 'string', 'max:255'],
+        'fck'                 => ['required', 'integer', 'min:0'],
+        'elemento'            => ['required', 'string', 'max:255'],
+        'fecha_moldeo'        => ['required', 'date'],
+        'hora_moldeo'         => ['required', 'date_format:H:i'],
+        'edad_ensayo'         => ['required', 'integer', 'min:0'],
+        'defecto'             => ['nullable', 'string', 'max:255'],
+        'carga_rotura'        => ['nullable', 'numeric', 'min:0'],
+        'tipo_rotura'         => ['nullable', 'integer', 'between:1,6'],
+        'diametro_superior_1' => ['nullable', 'numeric', 'min:0'],
+        'diametro_superior_2' => ['nullable', 'numeric', 'min:0'],
+        'diametro_inferior_1' => ['nullable', 'numeric', 'min:0'],
+        'diametro_inferior_2' => ['nullable', 'numeric', 'min:0'],
+        'altura_1'            => ['nullable', 'numeric', 'min:0'],
+        'altura_2'            => ['nullable', 'numeric', 'min:0'],
+        'altura_3'            => ['nullable', 'numeric', 'min:0'],
+    ];
+
+    /** Campos de resultado de ensayo: quedan bloqueados una vez que la probeta entró en un informe. */
+    private const CAMPOS_ENSAYO = [
+        'defecto', 'carga_rotura', 'tipo_rotura',
+        'diametro_superior_1', 'diametro_superior_2',
+        'diametro_inferior_1', 'diametro_inferior_2',
+        'altura_1', 'altura_2', 'altura_3',
+    ];
     /** Columnas habilitadas para ordenar: clave de columna => expresión SQL (calificada o alias del SELECT). */
     private const SORTABLE = [
         'nombre'              => 'probetas.nombre',
@@ -223,6 +253,84 @@ class BuscadorController extends Controller
         }
 
         return $sugerencias;
+    }
+
+    /** Edición inline de un campo propio de la probeta desde la fila del buscador. */
+    public function update(Request $request, Probeta $probeta): JsonResponse
+    {
+        $campo = $request->input('campo');
+
+        if (! is_string($campo) || ! array_key_exists($campo, self::REGLAS_EDICION)) {
+            return response()->json(['message' => 'Campo no editable.'], 422);
+        }
+
+        $esCampoEnsayo = in_array($campo, self::CAMPOS_ENSAYO, true);
+
+        if ($esCampoEnsayo && $probeta->detalles()->exists()) {
+            return response()->json(['message' => 'La probeta ya pertenece a un informe y no se puede editar.'], 403);
+        }
+
+        $validado = $request->validate(['valor' => self::REGLAS_EDICION[$campo]]);
+
+        $probeta->{$campo} = $validado['valor'];
+
+        if ($esCampoEnsayo) {
+            $completa = collect(self::CAMPOS_ENSAYO)->every(fn ($c) => $probeta->{$c} !== null);
+
+            if ($completa) {
+                if ($probeta->fecha_ensayo === null) {
+                    $probeta->fecha_ensayo = now()->toDateString();
+                    $probeta->ensayo_por   = session('usuario.id');
+                }
+            } else {
+                $probeta->fecha_ensayo = null;
+                $probeta->ensayo_por   = null;
+            }
+        }
+
+        $probeta->save();
+
+        return response()->json([
+            'ok'               => true,
+            'valor'            => $this->formatearValor($campo, $probeta->{$campo}),
+            'fecha_programada' => $probeta->fecha_moldeo->copy()->addDays($probeta->edad_ensayo)->format('d/m/Y'),
+            'es_ensayada'      => $this->estaEnsayada($probeta),
+        ]);
+    }
+
+    /** Formatea el valor guardado tal como se muestra en la celda de la tabla. */
+    private function formatearValor(string $campo, mixed $valor): string
+    {
+        if ($valor === null || $valor === '') {
+            return '—';
+        }
+
+        return match ($campo) {
+            'fecha_moldeo' => $valor->format('d/m/Y'),
+            'hora_moldeo'  => substr((string) $valor, 0, 5),
+            'edad_ensayo'  => $valor.' días',
+            'carga_rotura', 'diametro_superior_1', 'diametro_superior_2',
+            'diametro_inferior_1', 'diametro_inferior_2',
+            'altura_1', 'altura_2', 'altura_3' => number_format((float) $valor, 2),
+            default => (string) $valor,
+        };
+    }
+
+    /** Réplica de la condición de "ensayada" usada en el listado (ver es_ensayada en baseQuery). */
+    private function estaEnsayada(Probeta $probeta): bool
+    {
+        return $probeta->fecha_ensayo        !== null
+            && $probeta->ensayo_por          !== null
+            && $probeta->defecto             !== null
+            && $probeta->carga_rotura        !== null
+            && $probeta->tipo_rotura         !== null
+            && $probeta->diametro_superior_1 !== null
+            && $probeta->diametro_superior_2 !== null
+            && $probeta->diametro_inferior_1 !== null
+            && $probeta->diametro_inferior_2 !== null
+            && $probeta->altura_1            !== null
+            && $probeta->altura_2            !== null
+            && $probeta->altura_3            !== null;
     }
 
     /** @return array<int, array{key: string, dir: string}> */
