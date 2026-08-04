@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certificado #{{ $nroCertificado }} — {{ $obra->nombre }}</title>
+    <title>Certificado #{{ $certificado->numero }} — {{ $obra->nombre }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -226,7 +226,7 @@
             Certificación
         </a>
         <div class="nav-sep"></div>
-        <span class="navbar-title">Certificado #{{ $nroCertificado }}</span>
+        <span class="navbar-title">Certificado #{{ $certificado->numero }}</span>
     </div>
     <div class="navbar-user">
         <div class="user-chip">{{ strtoupper(substr(session('usuario.nick'), 0, 1)) }}</div>
@@ -254,7 +254,7 @@
     <div class="page-header">
         <div>
             <div class="page-label">{{ $obra->nombre }} — Certificación</div>
-            <div class="page-heading">Certificado #{{ $nroCertificado }}</div>
+            <div class="page-heading">Certificado #{{ $certificado->numero }}</div>
             <div class="chips">
                 @if($certificado->verificado)
                     <span class="chip chip-verde">

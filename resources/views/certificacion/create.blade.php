@@ -218,6 +218,24 @@
             </div>
             <div class="fields-grid">
                 <div class="field">
+                    <label for="numero">Número</label>
+                    <input
+                        type="number"
+                        id="numero"
+                        name="numero"
+                        value="{{ old('numero', $ultimoCertificado ? $ultimoCertificado->numero + 1 : null) }}"
+                        placeholder="0"
+                        step="1"
+                        min="0"
+                        autocomplete="off"
+                        class="{{ $errors->has('numero') ? 'is-invalid' : '' }}"
+                    >
+                    @error('numero')
+                        <span class="field-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="field">
                     <label for="precio_unitario">Precio unitario</label>
                     <input
                         type="number"
@@ -251,7 +269,7 @@
                     @enderror
                 </div>
 
-                <div class="field field-full">
+                <div class="field">
                     <label for="señores">Señores</label>
                     <input
                         type="text"

@@ -65,6 +65,7 @@ class CertificacionController extends Controller
     {
         $request->validate(
             [
+                'numero'          => 'required|integer',
                 'precio_unitario' => 'required|numeric|min:0',
                 'señores'         => 'required|string|max:255',
                 'atte'            => 'required|string|max:255',
@@ -72,6 +73,8 @@ class CertificacionController extends Controller
                 'items.*'         => 'required|integer',
             ],
             [
+                'numero.required'          => 'El número es obligatorio.',
+                'numero.integer'           => 'El número debe ser un número entero.',
                 'precio_unitario.required' => 'El precio unitario es obligatorio.',
                 'precio_unitario.numeric'  => 'El precio unitario debe ser un número.',
                 'señores.required'         => 'El campo Señores es obligatorio.',
@@ -83,6 +86,7 @@ class CertificacionController extends Controller
 
         $certificado = Certificado::create([
             'obra_id'         => $obra->id,
+            'numero'          => $request->numero,
             'precio_unitario' => $request->precio_unitario,
             'señores'         => $request->señores,
             'atte'            => $request->atte,
@@ -155,6 +159,7 @@ class CertificacionController extends Controller
 
         $request->validate(
             [
+                'numero'          => 'required|integer',
                 'precio_unitario' => 'required|numeric|min:0',
                 'señores'         => 'required|string|max:255',
                 'atte'            => 'required|string|max:255',
@@ -162,6 +167,8 @@ class CertificacionController extends Controller
                 'items.*'         => 'required|integer',
             ],
             [
+                'numero.required'          => 'El número es obligatorio.',
+                'numero.integer'           => 'El número debe ser un número entero.',
                 'precio_unitario.required' => 'El precio unitario es obligatorio.',
                 'precio_unitario.numeric'  => 'El precio unitario debe ser un número.',
                 'señores.required'         => 'El campo Señores es obligatorio.',
@@ -172,6 +179,7 @@ class CertificacionController extends Controller
         );
 
         $certificado->update([
+            'numero'          => $request->numero,
             'precio_unitario' => $request->precio_unitario,
             'señores'         => $request->señores,
             'atte'            => $request->atte,
@@ -211,11 +219,6 @@ class CertificacionController extends Controller
         $logo    = $toBase64(storage_path('app/private/logo/logo-web.png'));
         $firmash = $toBase64(storage_path('app/private/firmash/firmash.png'));
 
-        // Número de certificado dentro de la obra
-        $nroCertificado = Certificado::where('obra_id', $obra->id)
-            ->where('id', '<=', $certificado->id)
-            ->count();
-
         // Totales
         $tipoCert      = $obra->tipo_certificacion;
         $totalProbetas = 0;
@@ -235,10 +238,10 @@ class CertificacionController extends Controller
 
         $pdf = Pdf::loadView('certificacion.pdf', compact(
             'obra', 'certificado', 'logo', 'firmash',
-            'nroCertificado', 'totalProbetas', 'totalMonto', 'tipoCert', 'nrosInformes'
+            'totalProbetas', 'totalMonto', 'tipoCert', 'nrosInformes'
         ))->setPaper('a4', 'portrait');
 
-        $filename = "Certificado {$nroCertificado} {$obra->nombre}.pdf";
+        $filename = "Certificado {$certificado->numero} {$obra->nombre}.pdf";
 
         return response($pdf->output(), 200, [
             'Content-Type'        => 'application/pdf',

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar certificado #{{ $nroCertificado }} — {{ $obra->nombre }}</title>
+    <title>Editar certificado #{{ $certificado->numero }} — {{ $obra->nombre }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -120,7 +120,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
             </svg>
-            Certificado #{{ $nroCertificado }}
+            Certificado #{{ $certificado->numero }}
         </a>
         <div class="nav-sep"></div>
         <span class="navbar-title">Editar certificado</span>
@@ -141,7 +141,7 @@
 
     <div class="page-header">
         <div class="page-label">Certificación — {{ $obra->nombre }}</div>
-        <div class="page-heading">Editar certificado #{{ $nroCertificado }}</div>
+        <div class="page-heading">Editar certificado #{{ $certificado->numero }}</div>
     </div>
 
     @if($errors->any())
@@ -167,6 +167,15 @@
             </div>
             <div class="fields-grid">
                 <div class="field">
+                    <label for="numero">Número</label>
+                    <input type="number" id="numero" name="numero"
+                        value="{{ old('numero', $certificado->numero) }}"
+                        placeholder="0" step="1" min="0" autocomplete="off"
+                        class="{{ $errors->has('numero') ? 'is-invalid' : '' }}">
+                    @error('numero')<span class="field-error">{{ $message }}</span>@enderror
+                </div>
+
+                <div class="field">
                     <label for="precio_unitario">Precio unitario</label>
                     <input type="number" id="precio_unitario" name="precio_unitario"
                         value="{{ old('precio_unitario', $certificado->precio_unitario) }}"
@@ -184,7 +193,7 @@
                     @error('atte')<span class="field-error">{{ $message }}</span>@enderror
                 </div>
 
-                <div class="field field-full">
+                <div class="field">
                     <label for="señores">Señores</label>
                     <input type="text" id="señores" name="señores"
                         value="{{ old('señores', $certificado->señores) }}"

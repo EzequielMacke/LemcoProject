@@ -71,30 +71,13 @@ class ReporteController extends Controller
 
         $certificados = $query->get();
 
-        $obrasIds = $certificados->pluck('obra_id')->unique();
-
-        // Número correlativo de cada certificado dentro de su obra (histórico completo, no solo el filtrado).
-        // Se arma con un array plano en vez de flatMap(): flatMap usa array_merge internamente,
-        // que reindexa claves enteras y hacía perder el id del certificado como clave.
-        $nrosCertificados = [];
-        foreach (
-            Certificado::whereIn('obra_id', $obrasIds)
-                ->orderBy('obra_id')->orderBy('id')
-                ->get(['id', 'obra_id'])
-                ->groupBy('obra_id') as $grupoHistorico
-        ) {
-            foreach ($grupoHistorico->values() as $idx => $cert) {
-                $nrosCertificados[$cert->id] = $idx + 1;
-            }
-        }
-
         $porObra = $certificados->groupBy('obra_id');
 
-        $filas = $porObra->map(function ($grupo) use ($nrosCertificados) {
+        $filas = $porObra->map(function ($grupo) {
             $obra     = $grupo->first()->obra;
             $tipoCert = $obra->tipo_certificacion;
 
-            $items = $grupo->map(function ($certificado) use ($tipoCert, $nrosCertificados) {
+            $items = $grupo->map(function ($certificado) use ($tipoCert) {
                 $probetas = 0;
                 foreach ($certificado->detalles as $d) {
                     $probetas += $tipoCert === 1
@@ -105,7 +88,7 @@ class ReporteController extends Controller
 
                 return [
                     'certificado' => $certificado,
-                    'nro'         => $nrosCertificados[$certificado->id] ?? $certificado->id,
+                    'nro'         => $certificado->numero,
                     'probetas'    => $probetas,
                     'monto'       => $monto,
                 ];

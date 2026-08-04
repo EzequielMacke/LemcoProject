@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Certificado #{{ $nroCertificado }} — {{ $obra->nombre }}</title>
+    <title>Certificado #{{ $certificado->numero }} — {{ $obra->nombre }}</title>
     <style>
         /* ── Página: sin márgenes en @page, los controla el body ── */
         @page {
@@ -301,7 +301,7 @@ $cantDetalles  = $certificado->detalles->count();
     <b>Ref.:</b> Control de hormigonado en la Obra {{ $obra->nombre }}
 </div>
 <div class="cert-nro">
-    Certificado N.° {{ str_pad($nroCertificado, 3, '0', STR_PAD_LEFT) }}
+    Certificado N.° {{ str_pad($certificado->numero, 3, '0', STR_PAD_LEFT) }}
 </div>
 
 <div class="cuerpo-parrafo">
@@ -380,7 +380,7 @@ $cantDetalles  = $certificado->detalles->count();
 {{-- ══════════════════════════════════════════════════════════════════ --}}
 <div class="page-break">
     <div class="detalle-titulo">
-        Detalle de probetas — Certificado N.° {{ str_pad($nroCertificado, 3, '0', STR_PAD_LEFT) }}
+        Detalle de probetas — Certificado N.° {{ str_pad($certificado->numero, 3, '0', STR_PAD_LEFT) }}
     </div>
 
     <table class="probetas">

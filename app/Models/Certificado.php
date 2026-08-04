@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['obra_id', 'precio_unitario', 'señores', 'atte', 'verificado', 'enviado'])]
+#[Fillable(['obra_id', 'precio_unitario', 'señores', 'atte', 'numero', 'verificado', 'enviado'])]
 class Certificado extends Model
 {
     protected function casts(): array
