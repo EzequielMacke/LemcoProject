@@ -85,6 +85,7 @@
             vertical-align: middle;
         }
         table.probetas tbody tr:nth-child(even) { background: #f5f5f5; }
+        table.probetas tbody tr.tr-nobreak { page-break-after: avoid; }
         .td-left { text-align: left !important; }
         .td-bold { font-weight: bold; }
         .td-avg  { background: #e8e8e8 !important; font-weight: bold; font-size: 8px; }
@@ -183,6 +184,7 @@
             return $grupo->values()->map(function ($row, $idx) use ($promedio, $span) {
                 $row['tensionPromedio'] = $promedio;
                 $row['rowspan']         = $idx === 0 ? $span : 0;
+                $row['ultimaDelGrupo']  = $idx === $span - 1;
                 return $row;
             });
         })
@@ -287,7 +289,7 @@
     <tbody>
         @foreach($rowsConPromedio as $i => $row)
         @php $p = $row['probeta']; @endphp
-        <tr>
+        <tr @if(!$row['ultimaDelGrupo']) class="tr-nobreak" @endif>
             <td class="td-bold">{{ $i + 1 }}</td>
             <td class="td-left">{{ $p->nombre ?? '—' }}@if($row['noSatisfactoria'])<span style="color:#cc0000;font-weight:bold;">*</span>@endif</td>
             <td class="td-left">{{ $p->elemento ?? '—' }}</td>
