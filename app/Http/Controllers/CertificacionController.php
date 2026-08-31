@@ -278,9 +278,7 @@ class CertificacionController extends Controller
         $logo    = $toBase64(storage_path('app/private/logo/logo-web.png'));
         $firmash = $toBase64(storage_path('app/private/firmash/firmash.png'));
 
-        $nroCertificado = Certificado::where('obra_id', $obra->id)
-            ->where('id', '<=', $certificado->id)
-            ->count();
+        $nroCertificado = $certificado->numero;
 
         $tipoCert      = $obra->tipo_certificacion;
         $totalProbetas = 0;
