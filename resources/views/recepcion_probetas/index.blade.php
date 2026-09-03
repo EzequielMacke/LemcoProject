@@ -234,6 +234,15 @@
         }
         .badge-bloqueada svg { width: 10px; height: 10px; flex-shrink: 0; }
 
+        /* ── Badge enviada ── */
+        .badge-enviada {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px;
+            background: #ecfeff; color: #0e7490; border: 1px solid #a5f3fc;
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .badge-enviada svg { width: 10px; height: 10px; flex-shrink: 0; }
+
         /* ── Badge anulada ── */
         .badge-anulada {
             display: inline-flex; align-items: center; gap: 4px;
@@ -458,6 +467,15 @@
             <div class="card-inner">
                 <div class="card-nro">{{ $remision->nro }}</div>
                 <div class="card-fecha">{{ $remision->created_at->format('d/m/Y') }}</div>
+
+                @if($remision->enviado)
+                <div style="margin-bottom:8px; display:flex; gap:5px; flex-wrap:wrap;">
+                    <span class="badge-enviada">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+                        Enviada
+                    </span>
+                </div>
+                @endif
 
                 <div class="card-rows">
                     <div class="card-row">

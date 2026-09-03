@@ -82,6 +82,8 @@ class RemisionController extends Controller
             Mail::to($correo)->send(new RemisionMail($remision, $obra, $pdfContent, $filename));
         }
 
+        $remision->update(['enviado' => 1]);
+
         return back()->with('success', "Remisión enviada a {$destinatarios->count()} destinatario(s).");
     }
 

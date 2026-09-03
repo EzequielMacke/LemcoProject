@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['nro', 'obra_id', 'contratista', 'estado', 'observacion', 'entregado_por', 'recibio_por'])]
+#[Fillable(['nro', 'obra_id', 'contratista', 'estado', 'observacion', 'entregado_por', 'recibio_por', 'enviado'])]
 class Remision extends Model
 {
     protected $table = 'remisiones';
@@ -16,6 +16,7 @@ class Remision extends Model
     {
         return [
             'estado' => 'integer',
+            'enviado' => 'integer',
         ];
     }
 
