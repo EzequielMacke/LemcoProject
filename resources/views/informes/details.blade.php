@@ -316,7 +316,7 @@
                         }
 
                         $tensionCorregida = ($tension !== null && $chd !== null) ? $tension * $chd : null;
-                        $noSatisfactoria  = in_array($p->tipo_rotura, [5, 6]);
+                        $noSatisfactoria  = in_array($p->tipo_rotura, [4, 5, 6]);
 
                         return [
                             'probeta'          => $p,
@@ -332,7 +332,7 @@
                         ];
                     });
 
-                    // Agrupar por mixer — excluir tipo 5 o 6 del promedio
+                    // Agrupar por mixer — excluir tipo 4, 5 o 6 del promedio
                     $rowsConPromedio = $rows
                         ->groupBy('mixer')
                         ->flatMap(function ($grupo) {

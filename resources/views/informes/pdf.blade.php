@@ -158,7 +158,7 @@
             else                  $chd = 1.0000;
         }
         $tensionCorregida = ($tension !== null && $chd !== null) ? $tension * $chd : null;
-        $noSatisfactoria  = in_array($p->tipo_rotura, [5, 6]);
+        $noSatisfactoria  = in_array($p->tipo_rotura, [4, 5, 6]);
         return [
             'probeta'          => $p,
             'dProm'            => $dProm,
@@ -321,12 +321,25 @@
     @if($tieneNoSatisfactorias)
     <div style="margin-bottom:3px;">
         <span style="color:#cc0000; font-weight:bold;">(*)</span>
-        Las roturas tipo 5 o 6 indican roturas no satisfactorias, por lo tanto, este resultado no se deberá utilizar para el juzgamiento de la resistencia del hormigón.
+        Las roturas tipo 4, 5 o 6 indican roturas no satisfactorias, por lo tanto, este resultado no se deberá utilizar para el juzgamiento de la resistencia del hormigón.
     </div>
     @endif
+    <div style="margin-bottom:3px;">
+        La información sobre la probeta, como el número de identificación, el elemento cargado, la fecha de moldeo y la resistencia característica fue provista por el peticionario.
+    </div>
+    <div style="margin-bottom:3px;">
+        Los resultados expresan exclusivamente a las probetas ensayadas, el muestreo queda a cargo del cliente.
+    </div>
+    <div style="margin-bottom:3px;">
+        Las conclusiones que pueden inferirse de la interpretación de los resultados quedan a total criterio del cliente.
+    </div>
     <div style="font-style:italic;">
         No se debe reproducir el informe completo ni parte del mismo sin la expresa autorización del laboratorio LEMCO.
     </div>
+</div>
+
+<div style="text-align:center; margin-top:8px; font-size:7.5px; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">
+    &mdash; Fin de Informe &mdash;
 </div>
 
 {{-- ══ FOOTER FIJO ══ --}}
