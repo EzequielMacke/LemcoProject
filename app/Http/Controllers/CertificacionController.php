@@ -398,6 +398,7 @@ class CertificacionController extends Controller
 
         if ($obra->tipo_certificacion === 1) {
             return Remision::where('obra_id', $obra->id)
+                ->where('estado', 1) // excluye remisiones anuladas (estado 2)
                 ->whereNotIn('id', $remisionesUsadas)
                 ->withCount('probetas')
                 ->orderBy('nro')
@@ -405,6 +406,7 @@ class CertificacionController extends Controller
         }
 
         return ProbetaInforme::where('obra_id', $obra->id)
+            ->where('estado', 1) // excluye informes anulados
             ->where('verificado', 1)
             ->whereNotIn('id', $informesUsados)
             ->with('recepcion')
