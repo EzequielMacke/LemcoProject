@@ -45,6 +45,8 @@ Route::middleware(Autenticado::class)->group(function () {
         return view('menu.index', compact('datosFaltantes'));
     })->name('menu.index');
 
+    Route::view('/instructivo', 'instructivo.index')->name('instructivo.index');
+
     Route::middleware('permiso:REP')->group(function () {
         Route::get('/reportes', [ReporteController::class, 'index'])->name('reporte.index');
     });
