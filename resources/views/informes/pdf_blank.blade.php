@@ -63,8 +63,8 @@
         .norma-lbl  { font-size: 6.5px; font-weight: bold; text-transform: uppercase; color: #555; margin-bottom: 6px; }
         .norma-val  { font-size: 11px; font-weight: bold; letter-spacing: 0.5px; line-height: 1.6; }
         .norma-anio { font-size: 9px; font-weight: bold; color: #333; }
-        .norma-img  { width: 36%; text-align: center; }
-        .norma-img img { max-width: 100%; max-height: 50px; }
+        .norma-img  { width: 55%; text-align: center; }
+        .norma-img img { max-width: 100%; max-height: 100px; }
 
         /* ════ TABLA PROBETAS ════ */
         table.probetas {
